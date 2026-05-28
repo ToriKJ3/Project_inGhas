@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>자율주행 AI의 트롤리 딜레마 — 토론 탐구보고서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --ink:    #E8E2D9;
+  --ink2:   #B8B0A4;
+  --ink3:   rgba(232,226,217,0.55);
+  --gold:   #C9A84C;
+  --gold2:  #E8C96A;
+  --red:    #C0392B;
+  --blue:   #2E86AB;
+  --green:  #27AE60;
+  --bg0:    #0C0C0F;
+  --bg1:    #111115;
+  --bg2:    #161619;
+  --bg3:    #1D1D22;
+  --line:   rgba(232,226,217,0.07);
+  --line2:  rgba(232,226,217,0.12);
+  --serif:  'Noto Serif KR', serif;
+  --sans:   'Noto Sans KR', sans-serif;
+  --mono:   'JetBrains Mono', monospace;
+  --content-max: 1280px;
+}
+
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased;}
+
+/* ── DECK ── */
+#deck{width:100vw;height:100vh;position:relative;overflow:hidden;}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:54px 72px;
+  opacity:0;pointer-events:none;
+  transform:translateX(44px);
+  transition:opacity .44s cubic-bezier(.4,0,.2,1),transform .44s cubic-bezier(.4,0,.2,1);
+  will-change:opacity,transform;overflow:hidden;
+}
+.slide.active{opacity:1;pointer-events:all;transform:translateX(0);}
+.slide.exit  {opacity:0;transform:translateX(-44px);transition:opacity .27s ease,transform .27s ease;}
+
+.s0{background:var(--bg0);}
+.s1{background:var(--bg1);}
+.s2{background:var(--bg2);}
+
+/* ── TEXTURE / DECO ── */
+.noise{
+  position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  opacity:.5;
+}
+.glow{position:absolute;border-radius:50%;pointer-events:none;z-index:0;}
+.slide > :not(.noise):not(.glow):not(.dv):not(.ghost-type){
+  position:relative;
+  z-index:1;
+  width:min(100%, var(--content-max));
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* ── CHROME ── */
+#progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .4s ease;z-index:200;}
+#counter {position:fixed;bottom:26px;right:44px;font-family:var(--mono);font-size:12px;color:var(--ink3);letter-spacing:.06em;z-index:200;}
+#hint    {position:fixed;bottom:26px;left:72px;font-family:var(--mono);font-size:11px;color:rgba(232,226,217,.18);letter-spacing:.05em;z-index:200;}
+#dots    {position:fixed;bottom:26px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:200;}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--line2);cursor:pointer;transition:background .3s,transform .3s;}
+.dot.on{background:var(--gold);transform:scale(1.5);}
+.nb{
+  position:fixed;top:50%;transform:translateY(-50%);
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(232,226,217,.04);border:1px solid var(--line2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--ink3);font-size:16px;
+  transition:background .2s,color .2s;z-index:200;user-select:none;
+}
+.nb:hover{background:rgba(232,226,217,.1);color:var(--ink);}
+#nl{left:18px;}#nr{right:18px;}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.a{opacity:0;}
+.slide.active .a{animation:fadeUp .55s ease forwards;}
+.d1{animation-delay:.04s!important}.d2{animation-delay:.12s!important}
+.d3{animation-delay:.20s!important}.d4{animation-delay:.28s!important}
+.d5{animation-delay:.36s!important}.d6{animation-delay:.44s!important}
+
+/* ── TYPOGRAPHY ── */
+.ov{
+  font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink3);margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.ov::before{content:'';display:inline-block;width:20px;height:1px;background:var(--gold);}
+
+/* serif titles for philosophical feel */
+.th{
+  font-family:var(--serif);
+  font-size:clamp(50px,6vw,86px);font-weight:700;line-height:1.08;
+  letter-spacing:-.01em;margin-bottom:18px;color:var(--ink);
+}
+.th em{font-style:normal;color:var(--gold2);}
+
+.ts{
+  font-family:var(--serif);
+  font-size:clamp(34px,4.1vw,58px);font-weight:700;line-height:1.12;
+  letter-spacing:-.005em;margin-bottom:10px;color:var(--ink);
+}
+.ts em{font-style:normal;color:var(--gold2);}
+
+.sub{font-size:17.5px;color:var(--ink2);line-height:1.75;max-width:980px;margin-bottom:34px;}
+
+/* ── QUOTE BLOCK ── */
+.quote{
+  border-left:3px solid var(--gold);
+  padding:16px 22px;
+  background:rgba(201,168,76,.07);
+  border-radius:0 8px 8px 0;
+  font-family:var(--serif);
+  font-size:17px;line-height:1.85;color:var(--ink);
+  margin:16px 0;font-style:italic;
+}
+.quote cite{
+  display:block;margin-top:10px;
+  font-family:var(--mono);font-size:11px;
+  color:var(--gold);font-style:normal;letter-spacing:.06em;
+}
+
+/* ── HIGHLIGHT ── */
+.hl{border-left:3px solid var(--gold);padding:13px 17px;background:rgba(201,168,76,.06);border-radius:0 8px 8px 0;font-size:14.8px;line-height:1.75;color:var(--ink2);margin:12px 0;}
+.hl.r{border-left-color:var(--red);   background:rgba(192,57,43,.06);}
+.hl.b{border-left-color:var(--blue);  background:rgba(46,134,171,.06);}
+.hl.g{border-left-color:var(--green); background:rgba(39,174,96,.06);}
+
+/* ── CARDS ── */
+.grid{display:grid;gap:18px;width:100%;}
+.g2{grid-template-columns:1fr 1fr;}
+.g3{grid-template-columns:1fr 1fr 1fr;}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:38px;align-items:start;}
+
+.card{background:var(--bg3);border:1px solid var(--line2);border-radius:12px;padding:28px;transition:border-color .25s;}
+.card:hover{border-color:rgba(201,168,76,.3);}
+.ov2{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:7px;}
+.ct{font-size:18px;font-weight:600;line-height:1.35;margin-bottom:7px;color:var(--ink);}
+.cb{font-size:14.8px;color:var(--ink2);line-height:1.72;}
+.card-g{border-color:rgba(201,168,76,.28);background:rgba(201,168,76,.05);}
+.card-r{border-color:rgba(192,57,43,.28); background:rgba(192,57,43,.05);}
+.card-b{border-color:rgba(46,134,171,.28);background:rgba(46,134,171,.05);}
+.card-gr{border-color:rgba(39,174,96,.28);background:rgba(39,174,96,.05);}
+
+/* ── DEBATE COMPARE ── */
+.debate{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:start;max-width:1280px;margin-top:20px;}
+.debate-side{border-radius:12px;padding:28px;border:1px solid var(--line2);}
+.debate-a{border-color:rgba(46,134,171,.35);background:rgba(46,134,171,.06);}
+.debate-b{border-color:rgba(192,57,43,.35);background:rgba(192,57,43,.06);}
+.debate-vs{
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:26px;font-weight:700;
+  color:var(--gold);padding:0 6px;margin-top:32px;
+}
+.debate-label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
+.debate-label.a{color:rgba(46,134,171,.8);}
+.debate-label.b{color:rgba(192,57,43,.8);}
+.debate-claim{font-family:var(--serif);font-size:17px;line-height:1.75;color:var(--ink);}
+.debate-sub{font-size:14px;color:var(--ink3);line-height:1.65;margin-top:10px;padding-top:10px;border-top:1px solid var(--line2);}
+
+/* ── STEP ── */
+.step{display:flex;gap:13px;margin-bottom:12px;align-items:flex-start;}
+.sn{width:28px;height:28px;border-radius:50%;border:1px solid var(--line2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:2px;}
+.step h4{font-size:16px;font-weight:500;margin-bottom:3px;color:var(--ink);}
+.step p {font-size:14px;color:var(--ink3);line-height:1.62;}
+
+/* ── FLOW — argument chain ── */
+.arg-chain{display:flex;flex-direction:column;gap:10px;margin:16px 0;}
+.arg-node{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:17px 20px;border-radius:10px;
+  background:var(--bg3);border:1px solid var(--line2);
+}
+.arg-icon{font-size:20px;flex-shrink:0;margin-top:2px;}
+.arg-title{font-size:16px;font-weight:600;margin-bottom:4px;color:var(--ink);}
+.arg-body{font-size:14.5px;color:var(--ink2);line-height:1.65;}
+.arg-arrow{text-align:center;color:var(--gold);font-size:14px;margin:-4px 0;font-family:var(--mono);}
+
+/* ── VERDICT BOX ── */
+.verdict{
+  background:rgba(201,168,76,.08);
+  border:1px solid rgba(201,168,76,.3);
+  border-radius:12px;padding:26px 30px;
+  margin:18px 0;
+}
+.verdict-label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.verdict-text{font-family:var(--serif);font-size:17px;line-height:1.9;color:var(--ink);}
+
+/* ── PRINCIPLE PILLS ── */
+.pill-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+.pill{
+  font-size:13.5px;font-weight:500;
+  padding:6px 14px;border-radius:999px;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.pill-g{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:var(--gold2);}
+.pill-r{background:rgba(192,57,43,.15); border:1px solid rgba(192,57,43,.3); color:#E07060;}
+.pill-b{background:rgba(46,134,171,.15);border:1px solid rgba(46,134,171,.3); color:#6AB8D4;}
+.pill-gr{background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.3);  color:#5FCE8A;}
+.pill::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+
+/* ── CHANGE TIMELINE ── */
+.tl{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin:20px 0;}
+.tl-col{padding:0 16px 0 0;position:relative;}
+.tl-col::after{content:'→';position:absolute;right:-4px;top:12px;color:var(--gold);font-size:14px;}
+.tl-col:last-child::after{display:none;}
+.tl-tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;}
+.tl-title{font-size:15.5px;font-weight:600;margin-bottom:5px;color:var(--ink);}
+.tl-body{font-size:13.8px;color:var(--ink3);line-height:1.65;}
+
+/* ── CONCL ITEMS ── */
+.concl{background:var(--bg3);border:1px solid var(--line2);border-radius:10px;padding:20px 24px;margin-bottom:10px;}
+.concl-num{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-bottom:6px;letter-spacing:.08em;}
+.concl-body{font-size:14.8px;color:var(--ink2);line-height:1.7;}
+
+/* ── DIVIDER ── */
+.dv{position:absolute;width:1px;height:100%;top:0;background:var(--line);pointer-events:none;z-index:0;}
+
+/* ── BALANCE VISUAL ── */
+.balance{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:16px 0;}
+.bal-bar{border-radius:4px 4px 0 0;transition:height .8s ease .3s;}
+.bal-label{font-family:var(--mono);font-size:10px;color:var(--ink3);text-align:center;margin-top:5px;}
+
+/* ── PRESENTATION SCALE ── */
+.slide [style*="font-size:10px"] { font-size: 11.5px !important; }
+.slide [style*="font-size:11px"] { font-size: 12.5px !important; }
+.slide [style*="font-size:12px"] { font-size: 14px !important; }
+.slide [style*="font-size:12.5px"] { font-size: 14.5px !important; }
+.slide [style*="font-size:13px"] { font-size: 15px !important; }
+.slide [style*="font-size:13.5px"] { font-size: 15.5px !important; }
+.slide [style*="font-size:14px"] { font-size: 16px !important; }
+.slide [style*="font-size:15px"] { font-size: 17px !important; }
+.slide [style*="font-size:16px"] { font-size: 18px !important; }
+
+@media (max-width:900px){
+  .slide{padding:42px 28px;}
+  .grid.g2,.grid.g3,.split,.debate,.tl{grid-template-columns:1fr;}
+  .debate-vs{margin:0; padding:4px 0;}
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="hint">← → 방향키 또는 클릭</div>
+<div id="counter">1 / 13</div>
+<div id="nl" class="nb">&#8592;</div>
+<div id="nr" class="nb">&#8594;</div>
+<div id="dots"></div>
+
+<div id="deck">
+
+<!-- ══ 01 COVER ══ -->
+<section class="slide s0 active" data-i="0">
+  <div class="noise"></div>
+  <div class="glow" style="left:50%;top:40%;transform:translate(-50%,-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(201,168,76,.10) 0%,transparent 60%);"></div>
+
+  <!-- decorative quote mark -->
+  <div class="ghost-type" style="position:absolute;left:72px;top:44px;font-family:var(--serif);font-size:200px;font-weight:700;color:rgba(201,168,76,.06);line-height:1;pointer-events:none;z-index:0;">"</div>
+
+  <div class="ov a d1">토론 탐구보고서</div>
+  <h1 class="th a d2" style="max-width:980px;">자율주행 자동차 AI는<br>트롤리 딜레마 상황에서<br><em>어떤 기준으로 판단해야</em> 하는가</h1>
+
+  <p style="font-size:15px;color:var(--ink3);line-height:1.7;max-width:760px;" class="a d3">
+    보행자 보호 우선 vs 탑승자 보호 우선<br>
+    생명 윤리 · 제조물 책임 · 위험 최소화 알고리즘
+  </p>
+
+  <div class="pill-row a d4">
+    <span class="pill pill-g">윤리적 판단</span>
+    <span class="pill pill-b">보행자 보호</span>
+    <span class="pill pill-r">탑승자 권리</span>
+    <span class="pill pill-gr">제조물 책임</span>
+    <span class="pill pill-g">자율주행 연결</span>
+  </div>
+
+  <div class="ghost-type" style="position:absolute;right:66px;bottom:44px;font-family:var(--serif);font-size:180px;font-weight:700;color:rgba(201,168,76,.04);line-height:1;pointer-events:none;z-index:0;">딜레마</div>
+</section>
+
+<!-- ══ 02 탐구 동기 ══ -->
+<section class="slide s1" data-i="1">
+  <div class="dv" style="right:42%;"></div>
+  <div class="ov a d1">탐구 동기</div>
+  <h2 class="ts a d2">왜 이 문제를 탐구했나</h2>
+
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
+    <div>
+      <div class="card" style="margin-bottom:12px;padding:20px;">
+        <div class="ov2">자율주행의 실제 문제</div>
+        <div class="ct">기술 + 윤리의 교차점</div>
+        <div class="cb">자율주행차는 단순히 차선을 따라가는 기술이 아니다. 사고 위험 상황에서 어떤 대상을 우선 보호할지, 어떤 기준을 알고리즘에 반영할지 결정해야 한다.</div>
+      </div>
+      <div class="card card-g" style="padding:20px;">
+        <div class="ov2" style="color:rgba(201,168,76,.7);">논제</div>
+        <div style="font-family:var(--serif);font-size:14px;line-height:1.75;color:var(--ink);font-style:italic;">"자율주행 자동차 AI는 트롤리 딜레마 상황에서 어떤 기준으로 판단해야 하는가?"</div>
+      </div>
+    </div>
+    <div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(201,168,76,.3);color:var(--gold);">1</div>
+        <div><h4>AI의 판단은 생명에 직결된다</h4><p>공공 도로에서의 자율주행 AI 판단은 탑승자·보행자·다른 운전자 모두에게 영향을 미친다.</p></div>
+      </div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(46,134,171,.3);color:var(--blue);">2</div>
+        <div><h4>단순한 기술 문제가 아니다</h4><p>윤리적 기준, 법적 책임, 사회적 신뢰가 함께 얽혀 있는 복합 문제.</p></div>
+      </div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(39,174,96,.3);color:var(--green);">3</div>
+        <div><h4>진행 중인 프로젝트와 연결</h4><p>교통사고 위험도 분석 프로젝트가 이 토론의 핵심 문제와 직접 연결된다.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 03 트롤리 딜레마 ══ -->
+<section class="slide s2" data-i="2">
+  <div class="ov a d1">배경 개념</div>
+  <h2 class="ts a d2">트롤리 딜레마란</h2>
+
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
+    <div>
+      <div class="quote" style="margin-top:0;">
+        한 사람을 희생하여 여러 사람을 구할 것인가, 혹은 아무 행동도 하지 않아 더 큰 피해가 발생하도록 둘 것인가.
+        <cite>— 철학적 사고 실험</cite>
+      </div>
+      <div class="hl" style="margin-top:14px;font-size:13px;">
+        <strong>자율주행에 적용하면</strong>: 피할 수 없는 사고 상황에서 AI가 어떤 방향으로 차량을 제어할지 결정해야 하는 문제가 된다.
+      </div>
+    </div>
+    <div>
+      <div style="font-size:13px;color:var(--ink3);font-family:var(--mono);margin-bottom:12px;letter-spacing:.06em;">자율주행에서 발생 가능한 상황</div>
+      <div class="card" style="padding:16px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;">
+          <span style="color:var(--blue);">다수 보행자</span>
+          <span style="font-family:var(--mono);color:var(--gold);">vs</span>
+          <span style="color:var(--blue);">한 명 보행자</span>
+        </div>
+      </div>
+      <div class="card" style="padding:16px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;">
+          <span style="color:var(--blue);">보행자</span>
+          <span style="font-family:var(--mono);color:var(--gold);">vs</span>
+          <span style="color:var(--red);">탑승자</span>
+        </div>
+      </div>
+      <div class="card" style="padding:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;">
+          <span style="color:var(--blue);">다수 보행자</span>
+          <span style="font-family:var(--mono);color:var(--gold);">vs</span>
+          <span style="color:var(--red);">탑승자</span>
+        </div>
+      </div>
+      <div class="hl b" style="margin-top:12px;font-size:13px;">
+        이 판단 기준은 기술 성능만의 문제가 아니라 <strong>생명 윤리·법적 책임·사회적 신뢰</strong>와 연결된다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 04 양측 입장 ══ -->
+<section class="slide s1" data-i="3">
+  <div class="ov a d1">토론 구성</div>
+  <h2 class="ts a d2">두 입장의 대립</h2>
+
+  <div class="debate a d3" style="max-width:1280px;">
+    <div class="debate-side debate-a">
+      <div class="debate-label a">나의 입장</div>
+      <div class="debate-claim">보행자 보호 우선</div>
+      <div class="debate-sub">
+        자율주행 AI는 사고 상황에서 전체 피해를 최소화하는 방향으로 판단해야 하며, 보호 장치가 없는 보행자의 안전을 더 우선적으로 고려해야 한다.
+      </div>
+    </div>
+    <div class="debate-vs">vs</div>
+    <div class="debate-side debate-b">
+      <div class="debate-label b">상대측 입장</div>
+      <div class="debate-claim">탑승자 보호 우선</div>
+      <div class="debate-sub">
+        자율주행 자동차를 구매한 탑승자의 안전이 우선되어야 한다. 구매자는 더 안전한 서비스를 기대할 권리가 있다.
+      </div>
+    </div>
+  </div>
+
+  <div class="grid g2 a d4" style="max-width:1280px;margin-top:14px;">
+    <div class="hl b" style="font-size:13px;">
+      <strong>내 주장의 핵심 근거</strong>: 탑승자는 안전벨트·에어백·차체를 통해 충격 흡수 가능. 보행자는 아무런 보호 없이 충격에 직접 노출.
+    </div>
+    <div class="hl r" style="font-size:13px;">
+      <strong>상대측의 핵심 근거</strong>: 고가의 자율주행차를 구매했는데 위급 상황에서 차가 자신을 보호하지 않는다면, 소비자 신뢰와 기술 수용성이 낮아진다.
+    </div>
+  </div>
+</section>
+
+<!-- ══ 05 나의 주장 ══ -->
+<section class="slide s2" data-i="4">
+  <div class="ov a d1">나의 주장</div>
+  <h2 class="ts a d2">보행자 취약성을<br>먼저 고려해야 한다</h2>
+
+  <div class="split a d3" style="max-width:1280px;margin-top:18px;align-items:start;">
+    <div>
+      <div class="arg-chain">
+        <div class="arg-node" style="border-color:rgba(46,134,171,.3);">
+          <div class="arg-icon">🛡️</div>
+          <div>
+            <div class="arg-title">탑승자의 보호 환경</div>
+            <div class="arg-body">안전벨트 · 에어백 · 차체 구조. 사고 발생 시 충격을 흡수하는 여러 겹의 보호 장치가 존재한다.</div>
+          </div>
+        </div>
+        <div class="arg-arrow">↕</div>
+        <div class="arg-node" style="border-color:rgba(192,57,43,.3);">
+          <div class="arg-icon">🚶</div>
+          <div>
+            <div class="arg-title">보행자의 무방비 상태</div>
+            <div class="arg-body">일상복만 입고 보도를 걷는 보행자는 자동차와 충돌 시 충격을 완화할 장치가 전혀 없다.</div>
+          </div>
+        </div>
+        <div class="arg-arrow">↓</div>
+        <div class="arg-node" style="border-color:rgba(201,168,76,.3);">
+          <div class="arg-icon">⚖️</div>
+          <div>
+            <div class="arg-title">피해 가능성의 비대칭</div>
+            <div class="arg-body">동일한 충돌에서 보행자의 예상 피해가 훨씬 크다면, AI는 이 비대칭을 반드시 반영해야 한다.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="quote">
+        단순히 사람 수만 세는 것이 아니라, 피해 가능성과 신체적 취약성을 함께 고려해야 한다.
+        <cite>— 나의 주장</cite>
+      </div>
+      <div class="hl g" style="margin-top:14px;font-size:13px;">
+        공공 도로에서 작동하는 기술은 개인 소유자의 이익보다 <strong>공공 안전</strong>을 우선으로 설계되어야 한다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 06 상대측 주장 & 반론 ══ -->
+<section class="slide s1" data-i="5">
+  <div class="ov a d1">상대측 주장 & 반론</div>
+  <h2 class="ts a d2">생명은 비용으로<br><em>환산될 수 없다</em></h2>
+
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
+    <div>
+      <div class="card card-r" style="padding:20px;margin-bottom:12px;">
+        <div class="ov2" style="color:rgba(192,57,43,.7);">상대측 주장</div>
+        <div class="ct">구매자의 권리와 상품성</div>
+        <div class="cb">고가의 AI를 구매한 사람은 더 안전한 서비스를 기대할 수 있다. 차량이 자신을 보호하지 않는다면 자율주행 기술에 대한 사회적 수용성이 낮아진다.</div>
+      </div>
+      <div class="hl" style="font-size:13px;">
+        탑승자 보호 관점은 상품성·소비자 신뢰 측면에서 생각해볼 가치가 있는 주장이었다. 일부 타당성을 인정하였다.
+      </div>
+    </div>
+    <div>
+      <div style="font-size:13px;color:var(--ink3);font-family:var(--mono);margin-bottom:10px;">나의 반론</div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(201,168,76,.3);color:var(--gold);">1</div>
+        <div><h4 style="font-size:13.5px;">구매 행위가 타인 생명보다 우선될 수 없다</h4><p>제품을 구매했다는 사실이 공공 도로에서 타인의 생명을 후순위로 만들 수는 없다.</p></div>
+      </div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(201,168,76,.3);color:var(--gold);">2</div>
+        <div><h4 style="font-size:13.5px;">공공 도로 = 공공 책임</h4><p>작동 공간이 공공 도로인 이상, 탑승자뿐 아니라 보행자·사회 전체의 안전이 설계 기준이 되어야 한다.</p></div>
+      </div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(201,168,76,.3);color:var(--gold);">3</div>
+        <div><h4 style="font-size:13.5px;">사회적 신뢰의 방향</h4><p>오히려 생명 우선 원칙을 지키는 AI가 장기적으로 더 큰 사회적 신뢰를 얻을 수 있다.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 07 쟁점 변화 ══ -->
+<section class="slide s2" data-i="6">
+  <div class="ov a d1">토론 과정</div>
+  <h2 class="ts a d2">쟁점은 어떻게 변했나</h2>
+
+  <div class="tl a d3" style="max-width:1280px;margin-top:20px;">
+    <div class="tl-col">
+      <div class="tl-tag">초반</div>
+      <div class="tl-title">보행자 vs 탑승자 선택</div>
+      <div class="tl-body">누구를 살릴 것인가. 이분법적 구도로 시작.</div>
+    </div>
+    <div class="tl-col">
+      <div class="tl-tag">중반 · 합의</div>
+      <div class="tl-title">생명 > 비용</div>
+      <div class="tl-body">상대측도 "돈을 냈으므로 생명을 후순위로 둔다"는 논리는 적절하지 않다고 인정.</div>
+    </div>
+    <div class="tl-col">
+      <div class="tl-tag">후반 · 확장</div>
+      <div class="tl-title">알고리즘 + 책임 문제</div>
+      <div class="tl-body">AI 판단 알고리즘 설계, 차량 안전 구조, 제조사의 법적 책임으로 논의 확장.</div>
+    </div>
+  </div>
+
+  <div class="grid g2 a d4" style="max-width:1280px;margin-top:18px;">
+    <div class="card card-gr" style="padding:18px;">
+      <div class="ov2" style="color:rgba(39,174,96,.7);">내가 받아들인 관점</div>
+      <div class="cb" style="font-size:13.5px;">구매자도 일정한 안전성을 기대할 수 있다. 탑승자가 무조건 위험을 감수하게 하는 것도 옳지 않다. 따라서 보행자 우선 + 탑승자 안전장치 강화를 함께 요구해야 한다.</div>
+    </div>
+    <div class="card card-b" style="padding:18px;">
+      <div class="ov2" style="color:rgba(46,134,171,.7);">결국 핵심 질문</div>
+      <div class="cb" style="font-size:13.5px;">"보행자냐 탑승자냐"가 아니라 — AI가 어떤 기준으로 위험을 판단해야 하며, 그 판단에 대해 누가 책임지는가.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 08 제조물 책임 ══ -->
+<section class="slide s1" data-i="7">
+  <div class="ov a d1">제조물 책임</div>
+  <h2 class="ts a d2">AI의 판단 =<br><em>인간이 설계한 알고리즘</em></h2>
+
+  <div class="split a d3" style="max-width:1280px;margin-top:18px;align-items:start;">
+    <div>
+      <div class="quote" style="margin-top:0;">
+        자율주행 시스템이 사고 판단을 자동으로 수행했다면, 그 판단 기준을 설계한 제조사·개발자·시스템 제공자에게도 책임을 물을 수 있어야 한다.
+      </div>
+      <div class="hl r" style="margin-top:14px;font-size:13px;">
+        사고 책임을 전적으로 탑승자에게 돌리는 것은 타당하지 않다. AI 판단은 결국 <strong>인간이 설계한 결과</strong>이다.
+      </div>
+    </div>
+    <div>
+      <div style="font-size:13px;color:var(--ink3);font-family:var(--mono);margin-bottom:10px;">책임 소재 구조</div>
+      <div class="arg-node" style="margin-bottom:10px;border-color:rgba(192,57,43,.3);">
+        <div class="arg-icon">🏭</div>
+        <div>
+          <div class="arg-title">제조사</div>
+          <div class="arg-body">차량 안전 구조 설계. 사고 시 탑승자 보호 장치 수준.</div>
+        </div>
+      </div>
+      <div class="arg-node" style="margin-bottom:10px;border-color:rgba(46,134,171,.3);">
+        <div class="arg-icon">💻</div>
+        <div>
+          <div class="arg-title">소프트웨어 개발자</div>
+          <div class="arg-body">판단 알고리즘 설계. 어떤 상황에서 어떤 행동을 선택할지 기준 수립.</div>
+        </div>
+      </div>
+      <div class="arg-node" style="border-color:rgba(201,168,76,.3);">
+        <div class="arg-icon">⚖️</div>
+        <div>
+          <div class="arg-title">법·제도</div>
+          <div class="arg-body">자율주행 사고에 대한 법적 책임 프레임워크. 아직 미완성 영역.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 09 최종 입장 ══ -->
+<section class="slide s2" data-i="8">
+  <div class="ov a d1">최종 입장</div>
+  <h2 class="ts a d2">단순한 선택이 아닌<br><em>종합적 위험 최소화</em></h2>
+
+  <div class="a d3" style="max-width:1280px;margin-top:16px;">
+    <div class="verdict">
+      <div class="verdict-label">최종 입장</div>
+      <div class="verdict-text">
+        자율주행 자동차 AI는 사고 상황에서 전체 피해를 최소화하는 방향으로 판단해야 하며, 그 과정에서 보호 장치가 부족한 보행자의 피해 가능성을 더 크게 고려해야 한다. 동시에 탑승자의 안전도 소홀히 해서는 안 되므로, 제조사는 탑승자를 더 안전하게 보호할 수 있는 차량 구조와 안전장치를 강화해야 한다. 또한 AI 판단으로 발생한 사고에 대해서는 제조물 책임과 알고리즘 설계 책임도 함께 논의되어야 한다.
+      </div>
+    </div>
+  </div>
+
+  <div class="pill-row a d4" style="max-width:1280px;">
+    <span class="pill pill-b">보행자 취약성 우선 반영</span>
+    <span class="pill pill-g">피해 가능성 수치화</span>
+    <span class="pill pill-r">탑승자 안전장치 강화</span>
+    <span class="pill pill-g">제조물 책임 명확화</span>
+  </div>
+</section>
+
+<!-- ══ 10 알고리즘 방향 ══ -->
+<section class="slide s1" data-i="9">
+  <div class="ov a d1">알고리즘 방향</div>
+  <h2 class="ts a d2">위험 최소화 알고리즘이<br>고려해야 할 요소</h2>
+
+  <div class="grid g2 a d3" style="max-width:1280px;margin-top:20px;">
+    <div class="card" style="padding:20px;">
+      <div class="ov2">피해 가능성</div>
+      <div class="ct">충돌 시 예상 피해 정도</div>
+      <div class="cb">보행자 vs 탑승자의 보호 장치 차이를 수치화. 동일 충격에서 예상 부상 정도를 가중치에 반영.</div>
+    </div>
+    <div class="card" style="padding:20px;">
+      <div class="ov2">보호 가능성</div>
+      <div class="ct">현재 상황에서 보호 가능한 범위</div>
+      <div class="cb">탑승자는 차량 구조로 추가 보호 가능. 보행자는 AI 판단이 유일한 보호 수단.</div>
+    </div>
+    <div class="card" style="padding:20px;">
+      <div class="ov2">생명 가치</div>
+      <div class="ct">수, 나이, 직업으로 서열 금지</div>
+      <div class="cb">사람 수나 사회적 역할로 생명의 우선순위를 정하는 것은 윤리적으로 수용 불가.</div>
+    </div>
+    <div class="card card-g" style="padding:20px;">
+      <div class="ov2" style="color:rgba(201,168,76,.7);">책임 소재</div>
+      <div class="ct">설계 단계부터 책임 포함</div>
+      <div class="cb">어떤 기준으로 판단하는지, 사고 발생 시 누가 책임지는지 — 알고리즘 설계 단계에서 함께 결정해야 한다.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 11 프로젝트 연결 ══ -->
+<section class="slide s2" data-i="10">
+  <div class="ov a d1">자율주행 프로젝트와 연결</div>
+  <h2 class="ts a d2">토론이 프로젝트와<br>만나는 지점</h2>
+
+  <div class="split a d3" style="max-width:1280px;margin-top:18px;align-items:start;">
+    <div>
+      <div class="card card-b" style="padding:20px;margin-bottom:12px;">
+        <div class="ov2" style="color:rgba(46,134,171,.7);">교통사고 위험도 분석 프로젝트</div>
+        <div class="ct">위험도를 수치로 판단하는 구조</div>
+        <div class="cb">기상·시간대·지역 사고 빈도·심각도를 결합해 위험도를 0~100으로 산출. 이 구조 자체가 이번 토론의 핵심 문제와 직결된다.</div>
+      </div>
+      <div class="hl" style="font-size:13px;">
+        위험 상황을 미리 수치화하고 판단 기준을 만드는 것은 교통사고 분석 프로젝트가 실제로 다루는 문제다.
+      </div>
+    </div>
+    <div>
+      <div style="font-size:13px;color:var(--ink3);font-family:var(--mono);margin-bottom:10px;">이번 토론이 준 시각</div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(201,168,76,.3);color:var(--gold);">1</div>
+        <div><h4 style="font-size:13.5px;">데이터만으로는 부족하다</h4><p>위험도 수치가 아무리 정확해도, 그 수치를 어떻게 판단에 반영할지는 윤리적 결정이다.</p></div>
+      </div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(46,134,171,.3);color:var(--blue);">2</div>
+        <div><h4 style="font-size:13.5px;">가중치 설계 = 가치 판단</h4><p>위험도 계산식의 가중치 하나하나가 결국 "무엇을 더 중요하게 여기는가"의 답이다.</p></div>
+      </div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(39,174,96,.3);color:var(--green);">3</div>
+        <div><h4 style="font-size:13.5px;">개발자의 사회적 책임</h4><p>소프트웨어를 만드는 사람은 성능만이 아니라, 그 소프트웨어가 사회에 미치는 영향을 함께 고민해야 한다.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 12 결론 ══ -->
+<section class="slide s1" data-i="11">
+  <div class="ov a d1">결론</div>
+  <h2 class="ts a d2">세 가지 결론</h2>
+
+  <div class="grid g3 a d3" style="max-width:1280px;margin-top:20px;">
+    <div class="concl">
+      <div class="concl-num">결론 01 · 생명 우선</div>
+      <div class="concl-body">자율주행 AI는 비용이나 소유자의 이익보다 생명과 피해 최소화를 우선해야 한다. 특히 <strong style="color:var(--gold2);">보호 장치가 부족한 보행자의 취약성</strong>을 중요하게 고려해야 한다.</div>
+    </div>
+    <div class="concl">
+      <div class="concl-num">결론 02 · 안전장치 강화</div>
+      <div class="concl-body">탑승자의 안전도 보장될 수 있도록 차량의 안전 설계를 강화해야 한다. 보행자 우선 판단과 <strong style="color:var(--gold2);">탑승자 보호는 동시에 추구</strong>할 수 있는 과제다.</div>
+    </div>
+    <div class="concl">
+      <div class="concl-num">결론 03 · 책임 명확화</div>
+      <div class="concl-body">AI 판단으로 발생한 사고에 대해서는 <strong style="color:var(--gold2);">제조물 책임과 알고리즘 설계 책임</strong>도 함께 논의되어야 한다. 기계의 선택이 아닌 인간의 설계다.</div>
+    </div>
+  </div>
+
+  <div class="hl a d4" style="max-width:1280px;margin-top:16px;font-size:14px;">
+    자율주행 기술은 단순한 이동 수단의 자동화가 아니라 <strong>인간의 생명과 사회적 책임을 함께 다루는 기술</strong>이다. 알고리즘은 기술적 효율성뿐 아니라 윤리적 정당성과 사회적 신뢰를 함께 고려하여 설계되어야 한다.
+  </div>
+</section>
+
+<!-- ══ 13 END ══ -->
+<section class="slide s0" data-i="12">
+  <div class="noise"></div>
+  <div class="glow" style="left:50%;top:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(201,168,76,.10) 0%,transparent 60%);"></div>
+
+  <div style="text-align:center;position:relative;z-index:1;" class="a d1">
+    <div style="font-family:var(--serif);font-size:100px;color:rgba(201,168,76,.15);line-height:1;margin-bottom:20px;pointer-events:none;">"</div>
+    <div class="ov" style="justify-content:center;margin-bottom:14px;">자율주행 AI의 트롤리 딜레마 — 토론 탐구보고서</div>
+    <h1 class="th" style="font-size:clamp(32px,4.5vw,52px);margin-bottom:14px;">감사합니다</h1>
+    <p style="font-size:15px;color:var(--ink3);">윤리 · 책임 · 알고리즘 설계</p>
+
+    <div class="pill-row" style="justify-content:center;margin-top:32px;">
+      <span class="pill pill-b">보행자 취약성</span>
+      <span class="pill pill-r">탑승자 안전</span>
+      <span class="pill pill-g">제조물 책임</span>
+      <span class="pill pill-g">위험 최소화</span>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const N = slides.length;
+let cur = 0, busy = false;
+
+const prog = document.getElementById('progress');
+const ctr  = document.getElementById('counter');
+const dotsEl = document.getElementById('dots');
+
+for (let i = 0; i < N; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0?' on':'');
+  d.addEventListener('click', () => go(i));
+  dotsEl.appendChild(d);
+}
+const dotEls = dotsEl.querySelectorAll('.dot');
+
+function ui() {
+  ctr.textContent = (cur+1)+' / '+N;
+  prog.style.width = ((cur+1)/N*100)+'%';
+  dotEls.forEach((d,i) => d.classList.toggle('on', i===cur));
+}
+
+function go(idx) {
+  if (idx===cur || busy) return;
+  busy = true;
+  slides[cur].classList.add('exit'); slides[cur].classList.remove('active');
+  cur = idx;
+  const next = slides[cur];
+  next.querySelectorAll('.a').forEach(el => { el.style.animation='none'; el.offsetHeight; el.style.animation=''; });
+  next.classList.add('active'); next.classList.remove('exit');
+  ui();
+  setTimeout(() => { slides.forEach(s => s.classList.remove('exit')); busy = false; }, 300);
+}
+
+const next = () => go(Math.min(cur+1, N-1));
+const prev = () => go(Math.max(cur-1, 0));
+document.getElementById('nr').addEventListener('click', next);
+document.getElementById('nl').addEventListener('click', prev);
+document.addEventListener('keydown', e => {
+  if (['ArrowRight','ArrowDown',' '].includes(e.key)) { e.preventDefault(); next(); }
+  if (['ArrowLeft','ArrowUp'].includes(e.key))        { e.preventDefault(); prev(); }
+});
+let tx = 0;
+document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+document.addEventListener('touchend',   e => { const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 50) dx < 0 ? next() : prev(); }, { passive: true });
+ui();
+</script>
+</body>
+</html>
