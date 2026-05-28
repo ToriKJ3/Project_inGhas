@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>경기도 교통사고 위험도 대시보드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+:root {
+  --blue:    #4F8EF7;
+  --cyan:    #22D3EE;
+  --green:   #34D399;
+  --amber:   #FBBF24;
+  --red:     #F87171;
+  --purple:  #A78BFA;
+  --bg0:     #060912;
+  --bg1:     #0B1120;
+  --bg2:     #111827;
+  --bg3:     #1A2237;
+  --line:    rgba(255,255,255,0.07);
+  --line2:   rgba(255,255,255,0.12);
+  --muted:   rgba(255,255,255,0.36);
+  --sub:     rgba(255,255,255,0.62);
+  --white:   #eef4ff;
+  --mono:    'JetBrains Mono', monospace;
+  --sans:    'Noto Sans KR', sans-serif;
+  --content-max: 1120px;
+}
+
+html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-family:var(--sans);color:var(--white);-webkit-font-smoothing:antialiased; }
+
+/* ── DECK ── */
+#deck { width:100vw;height:100vh;position:relative;overflow:hidden; }
+
+.slide {
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:52px 80px;
+  opacity:0;pointer-events:none;
+  transform:translateX(50px);
+  transition:opacity .42s cubic-bezier(.4,0,.2,1),transform .42s cubic-bezier(.4,0,.2,1);
+  will-change:opacity,transform;overflow:hidden;
+}
+.slide.active  { opacity:1;pointer-events:all;transform:translateX(0); }
+.slide.exit    { opacity:0;transform:translateX(-50px);transition:opacity .26s ease,transform .26s ease; }
+
+.s0 { background:var(--bg0); }
+.s1 { background:var(--bg1); }
+.s2 { background:var(--bg2); }
+
+/* ── GRID / GLOW DECO ── */
+.grid-bg {
+  position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:68px 68px;
+  mask-image:radial-gradient(ellipse 80% 90% at 65% 50%, black 15%, transparent 70%);
+}
+.glow {
+  position:absolute;border-radius:50%;pointer-events:none;z-index:0;
+}
+.slide > :not(.grid-bg):not(.glow):not(.ghost-type):not(.dv) {
+  position:relative;
+  z-index:1;
+  width:min(100%, var(--content-max));
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* ── CHROME ── */
+#progress { position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width .4s ease;z-index:200; }
+#counter  { position:fixed;bottom:26px;right:40px;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.06em;z-index:200; }
+#hint     { position:fixed;bottom:26px;left:80px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.16);letter-spacing:.05em;z-index:200; }
+#dots     { position:fixed;bottom:26px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:200; }
+.dot { width:5px;height:5px;border-radius:50%;background:var(--line2);cursor:pointer;transition:background .3s,transform .3s; }
+.dot.on { background:var(--blue);transform:scale(1.5); }
+.nb {
+  position:fixed;top:50%;transform:translateY(-50%);
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(255,255,255,.04);border:1px solid var(--line2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--muted);font-size:16px;
+  transition:background .2s,color .2s;z-index:200;user-select:none;
+}
+.nb:hover { background:rgba(255,255,255,.1);color:var(--white); }
+#nl { left:18px; } #nr { right:18px; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+@keyframes countUp { from{opacity:0;transform:scale(.8)} to{opacity:1;transform:scale(1)} }
+.a { opacity:0; }
+.slide.active .a { animation:fadeUp .55s ease forwards; }
+.d1{animation-delay:.04s!important}.d2{animation-delay:.12s!important}
+.d3{animation-delay:.20s!important}.d4{animation-delay:.28s!important}
+.d5{animation-delay:.36s!important}.d6{animation-delay:.44s!important}
+
+/* ── OVERLINE ── */
+.ov {
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:13px;
+  display:flex;align-items:center;gap:10px;
+}
+.ov::before { content:'';display:inline-block;width:20px;height:1px;background:var(--blue); }
+
+/* ── TITLES ── */
+.th {
+  font-size:clamp(42px,5.6vw,72px);font-weight:900;line-height:1.04;
+  letter-spacing:-.03em;margin-bottom:18px;
+}
+.th em { font-style:normal;color:var(--cyan); }
+
+.ts {
+  font-size:clamp(26px,3.4vw,46px);font-weight:800;line-height:1.12;
+  letter-spacing:-.025em;margin-bottom:10px;
+}
+.ts em { font-style:normal;color:var(--cyan); }
+
+.sub { font-size:15px;color:var(--sub);line-height:1.65;max-width:580px;margin-bottom:32px; }
+.slide > .sub { max-width:var(--content-max); }
+
+/* ── CHIPS ── */
+.chip {
+  font-family:var(--mono);font-size:11px;letter-spacing:.04em;
+  padding:4px 10px;border-radius:4px;display:inline-block;
+  background:rgba(79,142,247,.12);border:1px solid rgba(79,142,247,.28);color:rgba(79,142,247,.9);
+}
+.chip.g { background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.25);color:rgba(52,211,153,.9); }
+.chip.a { background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.25);color:rgba(251,191,36,.9); }
+.chip.r { background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.25);color:rgba(248,113,113,.9); }
+.chip.c { background:rgba(34,211,238,.1);border-color:rgba(34,211,238,.25);color:rgba(34,211,238,.9); }
+.chip.p { background:rgba(167,139,250,.1);border-color:rgba(167,139,250,.25);color:rgba(167,139,250,.9); }
+.chip-row { display:flex;flex-wrap:wrap;gap:7px;margin-top:30px; }
+
+/* ── CARDS ── */
+.grid  { display:grid;gap:13px;width:100%; }
+.g2    { grid-template-columns:1fr 1fr; }
+.g3    { grid-template-columns:1fr 1fr 1fr; }
+.g4    { grid-template-columns:repeat(4,1fr); }
+.split { display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start; }
+.sw    { grid-template-columns:3fr 2fr; }
+
+.card {
+  background:var(--bg3);border:1px solid var(--line2);border-radius:12px;padding:20px;
+  transition:border-color .25s;
+}
+.card:hover { border-color:rgba(255,255,255,.2); }
+.ov2 { font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px; }
+.ct  { font-size:15px;font-weight:600;line-height:1.35;margin-bottom:5px; }
+.cb  { font-size:13px;color:var(--sub);line-height:1.65; }
+
+.card-b  { border-color:rgba(79,142,247,.3);  background:rgba(79,142,247,.06); }
+.card-c  { border-color:rgba(34,211,238,.3);  background:rgba(34,211,238,.05); }
+.card-g  { border-color:rgba(52,211,153,.3);  background:rgba(52,211,153,.05); }
+.card-a  { border-color:rgba(251,191,36,.3);  background:rgba(251,191,36,.05); }
+.card-r  { border-color:rgba(248,113,113,.3); background:rgba(248,113,113,.05); }
+
+/* ── HIGHLIGHT ── */
+.hl {
+  border-left:3px solid var(--blue);padding:12px 16px;
+  background:rgba(79,142,247,.07);border-radius:0 8px 8px 0;
+  font-size:13.5px;line-height:1.7;color:var(--sub);margin:12px 0;
+}
+.hl.g { border-left-color:var(--green);background:rgba(52,211,153,.06); }
+.hl.a { border-left-color:var(--amber);background:rgba(251,191,36,.06); }
+.hl.r { border-left-color:var(--red);  background:rgba(248,113,113,.06); }
+.hl.c { border-left-color:var(--cyan); background:rgba(34,211,238,.06); }
+
+/* ── STEP ── */
+.step { display:flex;gap:13px;margin-bottom:12px;align-items:flex-start; }
+.sn {
+  width:26px;height:26px;border-radius:50%;border:1px solid var(--line2);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px;
+}
+.step h4 { font-size:14px;font-weight:500;margin-bottom:2px; }
+.step p  { font-size:12.5px;color:var(--muted);line-height:1.55; }
+
+/* ── FLOW ── */
+.flow { display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:16px 0; }
+.fb {
+  background:var(--bg3);border:1px solid var(--line2);border-radius:8px;
+  padding:10px 14px;font-size:12px;text-align:center;line-height:1.5;
+}
+.fb strong { display:block;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px; }
+.fa { color:var(--muted);font-size:16px; }
+
+/* ── PROBLEM/SOLUTION ── */
+.ps { display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:10px; }
+.ps-box { border-radius:9px;padding:13px 15px; }
+.ps-r { background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2); }
+.ps-g { background:rgba(52,211,153,.06); border:1px solid rgba(52,211,153,.2); }
+.ps-lbl { font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px; }
+.ps-lbl.r { color:rgba(248,113,113,.7); }
+.ps-lbl.g { color:rgba(52,211,153,.7); }
+.ps-body { font-size:13px;line-height:1.6;color:var(--sub); }
+
+/* ── FORMULA ── */
+.formula {
+  background:var(--bg3);border:1px solid var(--line2);border-radius:10px;
+  padding:18px 24px;font-family:var(--mono);font-size:clamp(12px,1.3vw,15px);
+  line-height:2.1;margin:16px 0;
+}
+.fb2  { color:var(--blue);  font-weight:600; }
+.fc2  { color:var(--cyan);  font-weight:600; }
+.fg2  { color:var(--green); font-weight:600; }
+.fa2  { color:var(--amber); font-weight:600; }
+
+/* ── GRADE ── */
+.grade-row { display:flex;gap:7px;margin-top:18px; }
+.gc {
+  flex:1;border-radius:8px;padding:11px 5px;text-align:center;border:1px solid var(--line2);
+}
+.gc .gl { font-family:var(--mono);font-size:20px;font-weight:700; }
+.gc .gr { font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono); }
+
+/* ── ARCH TABLE ── */
+.ar { display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px; }
+.ar:last-child { border-bottom:none; }
+.ai { width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0; }
+.an { font-weight:500;width:170px;flex-shrink:0; }
+.ad { color:var(--muted);line-height:1.5;font-size:12.5px; }
+
+/* ── MINI BAR ── */
+.mb { height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:7px; }
+.mbf { height:100%;border-radius:3px;transition:width .9s ease .3s; }
+
+/* ── LIMIT ── */
+.li { display:flex;gap:11px;margin-bottom:11px;font-size:13px;color:var(--sub);line-height:1.6;align-items:flex-start; }
+.lb {
+  font-family:var(--mono);font-size:10px;background:rgba(255,255,255,.05);
+  border:1px solid var(--line2);border-radius:4px;padding:2px 6px;color:var(--muted);flex-shrink:0;margin-top:2px;
+}
+
+/* ── DECO VERTICAL LINE ── */
+.dv { position:absolute;width:1px;height:100%;top:0;background:var(--line);pointer-events:none;z-index:0; }
+
+/* ── CHART ── */
+.cw { position:relative; }
+
+/* ── COMPARISON BADGE ROW ── */
+.cbr { display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;font-size:11px;color:var(--muted); }
+.cbr span { display:flex;align-items:center;gap:4px; }
+.cbr .dot2 { width:9px;height:9px;border-radius:2px;display:inline-block;flex-shrink:0; }
+
+/* ── END ── */
+.end-hex {
+  width:88px;height:88px;border-radius:16px;
+  background:rgba(79,142,247,.12);border:1px solid rgba(79,142,247,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:13px;font-weight:500;color:var(--blue);
+  margin:0 auto 26px;letter-spacing:.02em;text-align:center;line-height:1.4;
+}
+
+@media (max-width: 900px) {
+  .slide { padding:40px 28px; }
+  .grid.g2, .grid.g3, .grid.g4, .split, .ps { grid-template-columns:1fr; }
+  .an { width:130px; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="hint">← → 방향키 또는 클릭</div>
+<div id="counter">1 / 13</div>
+<div id="nl" class="nb">&#8592;</div>
+<div id="nr" class="nb">&#8594;</div>
+<div id="dots"></div>
+
+<div id="deck">
+
+<!-- ══ 01 COVER ══ -->
+<section class="slide s0 active" data-i="0">
+  <div class="grid-bg"></div>
+  <div class="glow" style="right:-60px;top:50%;transform:translateY(-50%);width:620px;height:620px;background:radial-gradient(circle,rgba(79,142,247,.18) 0%,transparent 65%);"></div>
+  <div class="glow" style="right:160px;top:15%;width:280px;height:280px;background:radial-gradient(circle,rgba(34,211,238,.12) 0%,transparent 65%);"></div>
+
+  <div class="ov a d1">탐구 보고서 · 데이터 분석 프로젝트</div>
+  <h1 class="th a d2">경기도 <em>교통사고</em><br>위험도 분석<br>대시보드</h1>
+  <p style="font-size:15px;color:var(--muted);line-height:1.65;max-width:1120px;" class="a d3">
+    공공데이터 CSV · 기상청 API · 위험도 알고리즘<br>
+    Flask 기반 실시간 웹 대시보드 개발
+  </p>
+  <div class="chip-row a d4">
+    <span class="chip">Python · pandas</span>
+    <span class="chip c">Flask</span>
+    <span class="chip g">Chart.js</span>
+    <span class="chip a">기상청 API</span>
+    <span class="chip r">KOROAD CSV</span>
+    <span class="chip p">자율주행 응용</span>
+  </div>
+
+  <div class="ghost-type" style="position:absolute;right:60px;bottom:40px;font-family:var(--mono);font-size:180px;font-weight:900;color:rgba(255,255,255,.025);line-height:1;pointer-events:none;z-index:0;letter-spacing:-.04em;">DB</div>
+</section>
+
+<!-- ══ 02 동기 & 목표 ══ -->
+<section class="slide s1" data-i="1">
+  <div class="dv" style="right:42%;"></div>
+  <div class="ov a d1">프로젝트 동기</div>
+  <h2 class="ts a d2">왜 만들었나</h2>
+
+  <div class="split a d3" style="max-width:1120px;margin-top:16px;align-items:start;">
+    <div>
+      <div class="card card-b" style="margin-bottom:12px;padding:20px;">
+        <div class="ov2" style="color:rgba(79,142,247,.7);">문제의식</div>
+        <div class="ct">교통사고 = 복합 위험 요인</div>
+        <div class="cb">운전자 부주의뿐 아니라 기상 조건·시간대·지역별 사고 빈도·사고 심각도가 복합적으로 작용한다.</div>
+      </div>
+      <div class="card" style="margin-bottom:12px;padding:20px;">
+        <div class="ov2">기존 방식의 한계</div>
+        <div class="ct">"비 오면 위험하다"는 직관</div>
+        <div class="cb">정성적 판단을 데이터 기반 수치로 검증 가능한 형태로 바꿀 필요가 있다.</div>
+      </div>
+      <div class="card card-c" style="padding:20px;">
+        <div class="ov2" style="color:rgba(34,211,238,.7);">자율주행 연결</div>
+        <div class="ct">도로 환경 위험 판단 구조</div>
+        <div class="cb">자율주행 안전 판단 알고리즘의 핵심 구조인 "현재 환경 위험도 계산"과 연결된다.</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:13px;color:var(--muted);font-family:var(--mono);margin-bottom:10px;letter-spacing:.06em;">프로젝트 목표 4가지</div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(79,142,247,.3);color:var(--blue);">1</div>
+        <div><h4>지역별 사고 위험도 기준표 생성</h4><p>KOROAD CSV → 경기도 31개 시·군 정규화</p></div>
+      </div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(34,211,238,.3);color:var(--cyan);">2</div>
+        <div><h4>기상 정보 수집</h4><p>기상청 ASOS(과거) + 초단기실황 API(실시간)</p></div>
+      </div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(52,211,153,.3);color:var(--green);">3</div>
+        <div><h4>0~100점 위험도 산출</h4><p>기상·시간대·사고빈도·심각도 가중치 결합</p></div>
+      </div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(251,191,36,.3);color:var(--amber);">4</div>
+        <div><h4>웹 대시보드 시각화</h4><p>카드·그래프·표 형태로 직관적 제공</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 03 시스템 구조 ══ -->
+<section class="slide s2" data-i="2">
+  <div class="ov a d1">시스템 구조</div>
+  <h2 class="ts a d2">전체 파이프라인</h2>
+
+  <div class="a d3" style="max-width:1120px;margin-top:18px;">
+    <div class="flow" style="justify-content:center;">
+      <div class="fb" style="border-color:rgba(248,113,113,.3);">
+        <strong>DATA A</strong>
+        교통사고 통계 CSV<br>
+        <span style="font-size:10px;color:var(--muted);">KOROAD 시·군구별</span>
+      </div>
+      <div class="fa">→</div>
+      <div class="fb">
+        <strong>STEP 1</strong>
+        전처리 · 정규화<br>
+        <span style="font-size:10px;color:var(--muted);">region_accident_risk.csv</span>
+      </div>
+      <div class="fa">+</div>
+      <div class="fb" style="border-color:rgba(251,191,36,.3);">
+        <strong>DATA B</strong>
+        기상청 API<br>
+        <span style="font-size:10px;color:var(--muted);">ASOS / 초단기실황</span>
+      </div>
+      <div class="fa">→</div>
+      <div class="fb" style="border-color:rgba(79,142,247,.3);">
+        <strong>STEP 2</strong>
+        위험도 계산<br>
+        <span style="font-size:10px;color:var(--muted);">가중치 알고리즘</span>
+      </div>
+      <div class="fa">→</div>
+      <div class="fb" style="border-color:rgba(52,211,153,.3);">
+        <strong>OUTPUT</strong>
+        Flask 대시보드<br>
+        <span style="font-size:10px;color:var(--muted);">웹 시각화</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="split a d4" style="max-width:1120px;align-items:start;margin-top:10px;">
+    <div>
+      <div style="font-size:13px;color:var(--muted);font-family:var(--mono);margin-bottom:10px;">기술 스택</div>
+      <div class="ar"><div class="ai" style="background:rgba(79,142,247,.15);">🐍</div><div class="an"><span class="chip" style="font-size:10px;">Python · pandas</span></div><div class="ad">데이터 전처리 및 위험도 계산</div></div>
+      <div class="ar"><div class="ai" style="background:rgba(34,211,238,.12);">🌐</div><div class="an"><span class="chip c" style="font-size:10px;">Flask</span></div><div class="ad">웹 서버, API 라우팅, 캐시 관리</div></div>
+      <div class="ar"><div class="ai" style="background:rgba(52,211,153,.12);">📊</div><div class="an"><span class="chip g" style="font-size:10px;">Chart.js</span></div><div class="ad">위험도 구성 그래프 · 지역 비교</div></div>
+      <div class="ar"><div class="ai" style="background:rgba(251,191,36,.12);">🌤️</div><div class="an"><span class="chip a" style="font-size:10px;">기상청 API</span></div><div class="ad">ASOS 과거 · 초단기실황 실시간</div></div>
+      <div class="ar"><div class="ai" style="background:rgba(167,139,250,.12);">🔑</div><div class="an"><span class="chip p" style="font-size:10px;">python-dotenv</span></div><div class="ad">.env 기반 API 키 보안 관리</div></div>
+    </div>
+    <div>
+      <div style="font-size:13px;color:var(--muted);font-family:var(--mono);margin-bottom:10px;">파일 구조</div>
+      <div class="card" style="padding:16px;">
+        <div style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--sub);">
+          traffic_risk_dashboard/<br>
+          <span style="color:var(--blue);">├─ app.py</span><br>
+          <span style="color:var(--muted);">├─ .env</span><br>
+          <span style="color:var(--muted);">├─ data/</span><br>
+          <span style="color:var(--cyan);">│  └─ region_accident_risk.csv</span><br>
+          <span style="color:var(--muted);">├─ templates/</span><br>
+          <span style="color:var(--green);">│  └─ index.html</span><br>
+          <span style="color:var(--muted);">└─ static/</span><br>
+          <span style="color:var(--amber);">　 ├─ style.css</span><br>
+          <span style="color:var(--amber);">　 └─ dashboard.js</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 04 데이터 소스 ══ -->
+<section class="slide s1" data-i="3">
+  <div class="ov a d1">데이터 구성</div>
+  <h2 class="ts a d2">두 가지 데이터 소스</h2>
+
+  <div class="split a d3" style="max-width:1120px;margin-top:18px;align-items:start;">
+    <div class="card" style="padding:26px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+        <div class="ov2" style="color:rgba(248,113,113,.7);">KOROAD CSV</div>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--muted);">한국도로교통공단</span>
+      </div>
+      <div style="font-size:16px;font-weight:600;margin-bottom:10px;">교통사고 집계 통계</div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--sub);line-height:2;">
+        시도 · 시군구<br>
+        사고건수 · 사망자수<br>
+        중상자수 · 경상자수<br>
+        부상신고자수
+      </div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line2);font-family:var(--mono);font-size:11px;color:rgba(248,113,113,.7);">
+        → 지역별 기본 사고 위험도 산출
+      </div>
+    </div>
+    <div>
+      <div class="card" style="padding:22px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div class="ov2" style="color:rgba(251,191,36,.7);">ASOS 시간자료</div>
+          <span class="chip a" style="font-size:10px;">과거 분석용</span>
+        </div>
+        <div class="cb" style="font-family:var(--mono);font-size:12px;line-height:1.9;">기온 · 강수량 · 적설량<br>풍속 · <strong style="color:var(--amber);">시정거리</strong></div>
+        <div style="font-family:var(--mono);font-size:11px;color:rgba(251,191,36,.7);margin-top:10px;">→ 안개·악천후 유형 분류 가능</div>
+      </div>
+      <div class="card" style="padding:22px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div class="ov2" style="color:rgba(34,211,238,.7);">초단기실황 API</div>
+          <span class="chip c" style="font-size:10px;">실시간 대시보드</span>
+        </div>
+        <div class="cb" style="font-family:var(--mono);font-size:12px;line-height:1.9;">기온 · 1시간 강수량<br>풍속 · 습도 · 강수형태<br><span style="color:rgba(248,113,113,.7);">※ 시정거리 미제공</span></div>
+        <div style="font-family:var(--mono);font-size:11px;color:rgba(34,211,238,.7);margin-top:10px;">→ 현재 기상 기반 실시간 위험도</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hl a a d4" style="max-width:1120px;margin-top:10px;font-size:13px;">
+    <strong>설계 결정</strong>: 집계 통계의 한계(사고 발생 시각 없음)를 인정하고, 사고 CSV는 "지역 기반 위험도"로, API는 "시간 기반 위험도"로 역할을 분리하여 보완.
+  </div>
+</section>
+
+<!-- ══ 05 위험도 알고리즘 ══ -->
+<section class="slide s2" data-i="4">
+  <div class="ov a d1">핵심 알고리즘</div>
+  <h2 class="ts a d2">위험도 계산식</h2>
+  <p style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:4px;" class="a d2">0 = 안전 &nbsp;·&nbsp; 100 = 위험</p>
+
+  <div class="formula a d3">
+    최종 위험도 &nbsp;=&nbsp;
+    <span class="fb2">기상 × 0.40</span> &nbsp;+&nbsp;
+    <span class="fa2">시간대 × 0.25</span> &nbsp;+&nbsp;
+    <span class="fc2">사고빈도 × 0.25</span> &nbsp;+&nbsp;
+    <span class="fg2">심각도 × 0.10</span>
+  </div>
+
+  <div class="grid g4 a d4" style="max-width:1120px;">
+    <div class="card card-b" style="padding:16px;">
+      <div class="ov2" style="color:rgba(79,142,247,.7);">기상 · 40%</div>
+      <div class="cb" style="font-size:12.5px;">강수량 · 풍속 · 기온 · 강수형태<br>폭우·결빙 조건 가중 부여</div>
+    </div>
+    <div class="card card-a" style="padding:16px;">
+      <div class="ov2" style="color:rgba(251,191,36,.7);">시간대 · 25%</div>
+      <div style="font-family:var(--mono);font-size:12px;margin-top:6px;line-height:1.95;">
+        18~20시 <strong style="color:var(--red);">85점</strong><br>
+        21~23시 <strong style="color:var(--amber);">70점</strong><br>
+        00~02시 <strong style="color:var(--red);">80점</strong><br>
+        그 외 <strong style="color:var(--muted);">30점</strong>
+      </div>
+    </div>
+    <div class="card card-c" style="padding:16px;">
+      <div class="ov2" style="color:rgba(34,211,238,.7);">사고빈도 · 25%</div>
+      <div class="cb" style="font-size:12.5px;">시·군별 사고건수 0~100 정규화<br><span style="font-family:var(--mono);">수원 100 · 시흥 45.79</span></div>
+    </div>
+    <div class="card card-g" style="padding:16px;">
+      <div class="ov2" style="color:rgba(52,211,153,.7);">심각도 · 10%</div>
+      <div style="font-family:var(--mono);font-size:11.5px;margin-top:6px;line-height:1.95;color:var(--sub);">
+        사망×5 + 중상×3<br>경상×1 + 부상신고×0.5<br>→ 0~100 정규화
+      </div>
+    </div>
+  </div>
+
+  <div class="a d5" style="max-width:1120px;margin-top:14px;">
+    <div style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:7px;">위험 등급</div>
+    <div class="grade-row">
+      <div class="gc" style="background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.3);">
+        <div class="gl" style="color:var(--red);">A</div><div class="gr">90~100</div>
+      </div>
+      <div class="gc" style="background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.28);">
+        <div class="gl" style="color:var(--amber);">B</div><div class="gr">80~89</div>
+      </div>
+      <div class="gc" style="background:rgba(79,142,247,.09);border-color:rgba(79,142,247,.25);">
+        <div class="gl" style="color:var(--blue);">C</div><div class="gr">70~79</div>
+      </div>
+      <div class="gc" style="background:rgba(34,211,238,.07);border-color:rgba(34,211,238,.2);">
+        <div class="gl" style="color:var(--cyan);">D</div><div class="gr">60~69</div>
+      </div>
+      <div class="gc" style="background:rgba(52,211,153,.07);border-color:rgba(52,211,153,.2);">
+        <div class="gl" style="color:var(--green);">E</div><div class="gr">50~59</div>
+      </div>
+      <div class="gc">
+        <div class="gl" style="color:var(--muted);">F</div><div class="gr">0~49</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 06 대시보드 기능 ══ -->
+<section class="slide s1" data-i="5">
+  <div class="ov a d1">대시보드 기능</div>
+  <h2 class="ts a d2">웹 대시보드 구현</h2>
+
+  <div class="split a d3" style="max-width:1120px;margin-top:16px;align-items:start;">
+    <div>
+      <div class="grid g2" style="gap:10px;margin-bottom:12px;">
+        <div class="card" style="padding:15px;">
+          <div class="ov2">지역 선택</div>
+          <div class="cb" style="font-size:12.5px;">경기도 내 시·군 선택 시 해당 지역 기준값 자동 적용</div>
+        </div>
+        <div class="card" style="padding:15px;">
+          <div class="ov2">실시간 기상 조회</div>
+          <div class="cb" style="font-size:12.5px;">초단기실황 API 호출 → 기온·강수량·풍속·습도·강수형태</div>
+        </div>
+        <div class="card" style="padding:15px;">
+          <div class="ov2">위험도 카드</div>
+          <div class="cb" style="font-size:12.5px;">최종 점수 + 등급 + 4개 요소별 점수 카드</div>
+        </div>
+        <div class="card" style="padding:15px;">
+          <div class="ov2">위험 요인 해석</div>
+          <div class="cb" style="font-size:12.5px;font-family:var(--mono);color:rgba(34,211,238,.7);">"강수가 관측되었습니다."<br>"결빙 가능성 증가."</div>
+        </div>
+      </div>
+      <div class="card card-c" style="padding:15px;">
+        <div class="ov2" style="color:rgba(34,211,238,.7);">시각화 그래프 (Chart.js)</div>
+        <div class="cb" style="font-size:12.5px;">위험도 구성 비율 그래프 · 지역별 위험도 비교 그래프 · 상세 결과 표</div>
+      </div>
+    </div>
+    <div>
+      <!-- mock dashboard card -->
+      <div class="card" style="padding:22px;border-color:rgba(79,142,247,.3);">
+        <div style="font-size:11px;font-family:var(--mono);color:var(--muted);margin-bottom:12px;">DASHBOARD PREVIEW</div>
+        <div style="text-align:center;margin-bottom:16px;">
+          <div style="font-family:var(--mono);font-size:48px;font-weight:700;color:var(--amber);line-height:1;">67.3</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;font-family:var(--mono);">위험도 D · 보통 이상</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;">
+          <div style="background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.2);border-radius:7px;padding:10px;text-align:center;">
+            <div style="color:var(--muted);font-family:var(--mono);font-size:10px;margin-bottom:3px;">기상</div>
+            <div style="font-family:var(--mono);font-weight:600;color:var(--blue);">72.0</div>
+          </div>
+          <div style="background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:7px;padding:10px;text-align:center;">
+            <div style="color:var(--muted);font-family:var(--mono);font-size:10px;margin-bottom:3px;">시간대</div>
+            <div style="font-family:var(--mono);font-weight:600;color:var(--amber);">70.0</div>
+          </div>
+          <div style="background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.18);border-radius:7px;padding:10px;text-align:center;">
+            <div style="color:var(--muted);font-family:var(--mono);font-size:10px;margin-bottom:3px;">사고빈도</div>
+            <div style="font-family:var(--mono);font-weight:600;color:var(--cyan);">60.5</div>
+          </div>
+          <div style="background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.18);border-radius:7px;padding:10px;text-align:center;">
+            <div style="color:var(--muted);font-family:var(--mono);font-size:10px;margin-bottom:3px;">심각도</div>
+            <div style="font-family:var(--mono);font-weight:600;color:var(--green);">55.0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 07 과거 분석 결과 ══ -->
+<section class="slide s2" data-i="6">
+  <div class="ov a d1">분석 결과 · 9월 호우 사례</div>
+  <h2 class="ts a d2">2025년 9월 16~17일<br>수도권 <em>호우</em> 검증</h2>
+  <p style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:16px;" class="a d2">18:00 ~ 익일 02:00 · 총 279행</p>
+
+  <div class="split a d3" style="max-width:1120px;align-items:start;">
+    <div>
+      <div class="grid g3" style="margin-bottom:14px;">
+        <div class="card" style="text-align:center;padding:16px;border-color:rgba(248,113,113,.3);">
+          <div style="font-family:var(--mono);font-size:30px;font-weight:700;color:var(--red);">61.5</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px;">안개 평균</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px;">133건 · 최고 85.00</div>
+        </div>
+        <div class="card" style="text-align:center;padding:16px;border-color:rgba(79,142,247,.3);">
+          <div style="font-family:var(--mono);font-size:30px;font-weight:700;color:var(--blue);">41.7</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px;">비 평균</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px;">30건 · 최고 64.35</div>
+        </div>
+        <div class="card" style="text-align:center;padding:16px;">
+          <div style="font-family:var(--mono);font-size:30px;font-weight:700;color:var(--muted);">33.8</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px;">없음 평균</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px;">116건 · 최고 57.85</div>
+        </div>
+      </div>
+      <div class="hl r" style="font-size:13px;">
+        <strong>핵심 발견</strong>: 단순 강수보다 <strong>시정거리 저하·안개</strong>가 위험도 상승의 더 뚜렷한 요인. 안개 61.5 vs 비 41.7 vs 없음 33.8
+      </div>
+      <div class="hl c" style="font-size:13px;margin-top:8px;">
+        <strong>한계</strong>: 초단기실황 API는 시정거리 미제공 → 실시간 대시보드에서는 안개 위험도 직접 반영 불가
+      </div>
+    </div>
+    <div class="card" style="padding:18px;">
+      <div style="font-size:13px;font-weight:500;margin-bottom:4px;">악천후 유형별 평균 위험도</div>
+      <div class="cbr" style="margin-bottom:8px;">
+        <span><span class="dot2" style="background:var(--red);"></span>안개</span>
+        <span><span class="dot2" style="background:var(--blue);"></span>비</span>
+        <span><span class="dot2" style="background:#555;"></span>없음</span>
+      </div>
+      <div class="cw" style="height:200px;">
+        <canvas id="wChart"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 08 지역 비교 ══ -->
+<section class="slide s1" data-i="7">
+  <div class="ov a d1">지역 분석</div>
+  <h2 class="ts a d2">경기도 시·군 위험도 기준값</h2>
+  <p class="sub a d2" style="margin-bottom:16px;">KOROAD CSV → 0~100 정규화 결과 (상위 지역)</p>
+
+  <div class="split a d3" style="max-width:1120px;align-items:start;">
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr>
+            <th style="font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:10px 14px;border-bottom:1px solid var(--line2);font-weight:400;">지역</th>
+            <th style="font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:10px 14px;border-bottom:1px solid var(--line2);font-weight:400;">사고건수</th>
+            <th style="font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:10px 14px;border-bottom:1px solid var(--line2);font-weight:400;">빈도위험도</th>
+            <th style="font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:10px 14px;border-bottom:1px solid var(--line2);font-weight:400;">심각도위험도</th>
+            <th style="border-bottom:1px solid var(--line2);width:90px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-weight:600;">수원시</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--mono);">4,720</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--mono);color:var(--red);font-weight:600;">100.00</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--mono);color:var(--red);font-weight:600;">100.00</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);"><div class="mb"><div class="mbf t1" style="width:0%;background:var(--red);"></div></div></td></tr>
+          <tr><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-weight:600;">화성시</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--mono);">3,711</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--mono);color:var(--amber);">77.78</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--mono);color:var(--amber);">81.58</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);"><div class="mb"><div class="mbf t2" style="width:0%;background:var(--amber);"></div></div></td></tr>
+          <tr><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-weight:600;">안산시</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--mono);">3,513</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--mono);color:var(--blue);">73.41</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--mono);color:var(--blue);">74.14</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);"><div class="mb"><div class="mbf t3" style="width:0%;background:var(--blue);"></div></div></td></tr>
+          <tr><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-weight:600;">고양시</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--mono);">3,489</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--mono);color:var(--blue);">72.89</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--mono);color:var(--blue);">76.85</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);"><div class="mb"><div class="mbf t4" style="width:0%;background:var(--blue);"></div></div></td></tr>
+          <tr><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-weight:600;">성남시</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--mono);">3,487</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--mono);color:var(--blue);">72.84</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--mono);color:var(--blue);">74.66</td><td style="padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);"><div class="mb"><div class="mbf t5" style="width:0%;background:var(--blue);"></div></div></td></tr>
+          <tr><td style="padding:9px 14px;font-weight:600;color:var(--muted);">시흥시</td><td style="padding:9px 14px;font-family:var(--mono);color:var(--muted);">2,259</td><td style="padding:9px 14px;font-family:var(--mono);color:var(--muted);">45.79</td><td style="padding:9px 14px;font-family:var(--mono);color:var(--muted);">49.30</td><td style="padding:9px 14px;"><div class="mb"><div class="mbf t6" style="width:0%;background:var(--green);"></div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div class="card" style="padding:18px;">
+        <div style="font-size:13px;font-weight:500;margin-bottom:4px;">지역별 위험도 기준값</div>
+        <div class="cbr">
+          <span><span class="dot2" style="background:var(--red);"></span>빈도위험도</span>
+          <span><span class="dot2" style="background:var(--blue);"></span>심각도위험도</span>
+        </div>
+        <div class="cw" style="height:220px;">
+          <canvas id="rChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 09 문제 해결 — API 오류 ══ -->
+<section class="slide s2" data-i="8">
+  <div class="ov a d1">구현 문제 해결</div>
+  <h2 class="ts a d2">API 연동 중 발생한<br>세 가지 문제</h2>
+
+  <div class="grid g3 a d3" style="max-width:1120px;margin-top:20px;">
+    <div>
+      <div class="ps" style="margin-bottom:10px;">
+        <div class="ps-box ps-r">
+          <div class="ps-lbl r">문제 1</div>
+          <div class="ps-body">401 Unauthorized<br>403 Forbidden</div>
+        </div>
+        <div class="ps-box ps-g">
+          <div class="ps-lbl g">해결</div>
+          <div class="ps-body"><code style="font-family:var(--mono);font-size:11px;color:rgba(52,211,153,.8);">serviceKey</code>를 URL에 직접 포함, 파라미터 구조 수정</div>
+        </div>
+      </div>
+      <div class="hl g" style="font-size:12.5px;">API 요청 방식과 서비스 승인 상태, URL 구성 방식의 문제임을 분석 후 해결</div>
+    </div>
+    <div>
+      <div class="ps" style="margin-bottom:10px;">
+        <div class="ps-box ps-r">
+          <div class="ps-lbl r">문제 2</div>
+          <div class="ps-body">429 API rate<br>limit exceeded</div>
+        </div>
+        <div class="ps-box ps-g">
+          <div class="ps-lbl g">해결</div>
+          <div class="ps-body">서버 메모리 캐싱 + 지역 비교 기본 수 10 → 5 축소</div>
+        </div>
+      </div>
+      <div class="card" style="padding:14px;font-family:var(--mono);font-size:12px;color:var(--sub);line-height:1.8;">
+        WEATHER_CACHE[<br>
+        &nbsp;&nbsp;(지역, 기준일자,<br>
+        &nbsp;&nbsp; 기준시각)<br>
+        ] = 기상 데이터
+      </div>
+    </div>
+    <div>
+      <div class="ps" style="margin-bottom:10px;">
+        <div class="ps-box ps-r">
+          <div class="ps-lbl r">문제 3</div>
+          <div class="ps-body">오류 메시지에<br>API 키 노출 위험</div>
+        </div>
+        <div class="ps-box ps-g">
+          <div class="ps-lbl g">해결</div>
+          <div class="ps-body">URL 마스킹 함수 추가<br>.env 키 분리 관리</div>
+        </div>
+      </div>
+      <div class="card" style="padding:14px;font-family:var(--mono);font-size:12px;color:rgba(248,113,113,.7);">
+        ***API_KEY_MASKED***
+      </div>
+      <div class="hl" style="font-size:12.5px;margin-top:8px;">
+        .env 파일 기반 인증키 보안 관리, 오류 메시지에 키가 출력되지 않도록 처리
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 10 시각화 차트 ══ -->
+<section class="slide s1" data-i="9">
+  <div class="ov a d1">시각화 · Chart.js</div>
+  <h2 class="ts a d2">위험도 구성 시각화</h2>
+
+  <div class="split a d3" style="max-width:1120px;margin-top:16px;align-items:start;">
+    <div class="card" style="padding:18px;">
+      <div style="font-size:13px;font-weight:500;margin-bottom:4px;">시간대별 위험도 점수</div>
+      <div class="cbr"><span><span class="dot2" style="background:var(--red);"></span>위험도 점수</span></div>
+      <div class="cw" style="height:200px;"><canvas id="tChart"></canvas></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.5;">18~20시 퇴근·시야저하, 00~02시 피로운전이 위험도 상위 구간</div>
+    </div>
+    <div>
+      <div class="card" style="padding:18px;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:500;margin-bottom:4px;">위험도 구성 비율</div>
+        <div class="cbr">
+          <span><span class="dot2" style="background:var(--blue);"></span>기상 40%</span>
+          <span><span class="dot2" style="background:var(--amber);"></span>시간대 25%</span>
+          <span><span class="dot2" style="background:var(--cyan);"></span>사고빈도 25%</span>
+          <span><span class="dot2" style="background:var(--green);"></span>심각도 10%</span>
+        </div>
+        <div class="cw" style="height:180px;"><canvas id="pChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 11 한계 & 개선 ══ -->
+<section class="slide s2" data-i="10">
+  <div class="ov a d1">한계 및 개선 방향</div>
+  <h2 class="ts a d2">솔직한 한계 분석</h2>
+
+  <div class="split a d3" style="max-width:1120px;margin-top:18px;align-items:start;">
+    <div>
+      <div style="font-size:13px;color:var(--muted);font-family:var(--mono);margin-bottom:10px;">현재 한계</div>
+      <div class="li"><span class="lb">①</span><span>교통사고 CSV는 집계 통계라 <strong>개별 사고 시각과 기상 데이터를 직접 매칭 불가</strong></span></div>
+      <div class="li"><span class="lb">②</span><span>초단기실황 API는 <strong>시정거리 미제공</strong> → 실시간 대시보드에서 안개 위험도 직접 반영 한계</span></div>
+      <div class="li"><span class="lb">③</span><span>사고건수가 많은 대도시가 높게 나타나는 구조 → <strong>인구·교통량 보정 변수 필요</strong></span></div>
+      <div class="li"><span class="lb">④</span><span>현재 <strong>가중치는 탐구 목적 기준</strong>, 교통공학적 검증을 거친 공식 모델 아님</span></div>
+    </div>
+    <div>
+      <div style="font-size:13px;color:var(--muted);font-family:var(--mono);margin-bottom:10px;">향후 개선 방향</div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(79,142,247,.3);color:var(--blue);">1</div>
+        <div><h4 style="font-size:13.5px;">지역 위험도 보정</h4><p>교통량·인구수·도로 길이·차량 등록대수 추가</p></div>
+      </div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(34,211,238,.3);color:var(--cyan);">2</div>
+        <div><h4 style="font-size:13.5px;">시정거리 API 추가</h4><p>안개 위험도 실시간 반영 가능하도록 확장</p></div>
+      </div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(52,211,153,.3);color:var(--green);">3</div>
+        <div><h4 style="font-size:13.5px;">캐시 고도화</h4><p>메모리 캐시 → 파일/DB 캐시로 전환</p></div>
+      </div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(251,191,36,.3);color:var(--amber);">4</div>
+        <div><h4 style="font-size:13.5px;">지도 기반 시각화</h4><p>경기도 지도 위에 지역별 위험도 표시</p></div>
+      </div>
+      <div class="step">
+        <div class="sn" style="border-color:rgba(167,139,250,.3);color:var(--purple);">5</div>
+        <div><h4 style="font-size:13.5px;">자율주행 확장</h4><p>도로 환경 위험 판단 모델로 구조 확장</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 12 결론 ══ -->
+<section class="slide s1" data-i="11">
+  <div class="ov a d1">결론</div>
+  <h2 class="ts a d2">탐구 요약</h2>
+
+  <div class="grid g3 a d3" style="max-width:1120px;margin-top:18px;">
+    <div class="card card-b" style="padding:20px;">
+      <div class="ov2" style="color:rgba(79,142,247,.7);">데이터 수집 · 전처리</div>
+      <div class="ct">공공데이터 통합</div>
+      <div class="cb" style="font-size:12.5px;">KOROAD CSV 전처리로 경기도 31개 시·군 위험도 기준표 생성. 집계 통계의 한계를 인식하고 역할 분리 설계.</div>
+    </div>
+    <div class="card card-a" style="padding:20px;">
+      <div class="ov2" style="color:rgba(251,191,36,.7);">알고리즘 설계</div>
+      <div class="ct">가중치 기반 위험도 산출</div>
+      <div class="cb" style="font-size:12.5px;">4개 요소 × 가중치로 0~100점 산출. 안개 조건 시 위험도가 단순 강수보다 높다는 것을 데이터로 검증.</div>
+    </div>
+    <div class="card card-g" style="padding:20px;">
+      <div class="ov2" style="color:rgba(52,211,153,.7);">웹 시각화 · API 연동</div>
+      <div class="ct">Flask 풀스택 구현</div>
+      <div class="cb" style="font-size:12.5px;">Flask + Chart.js + 기상청 API + 캐시 + 마스킹까지. 인증 오류·호출 제한·보안을 직접 해결.</div>
+    </div>
+  </div>
+
+  <div class="hl c a d4" style="max-width:1120px;margin-top:14px;font-size:14px;">
+    <strong>자율주행 연결</strong>: 도로 위험 정보를 수집·계산·전달하는 소프트웨어 구조는 자율주행 안전 판단 알고리즘과 직접 연결되는 구조다. 이 프로젝트가 그 기초 설계를 경험하는 과정이었다.
+  </div>
+
+  <div class="grid g4 a d5" style="max-width:1120px;margin-top:12px;">
+    <div class="card" style="padding:14px;text-align:center;">
+      <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--blue);">4</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px;">가중치 요소</div>
+    </div>
+    <div class="card" style="padding:14px;text-align:center;">
+      <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--cyan);">6</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px;">등급 체계 A~F</div>
+    </div>
+    <div class="card" style="padding:14px;text-align:center;">
+      <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--amber);">3</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px;">API 오류 직접 해결</div>
+    </div>
+    <div class="card" style="padding:14px;text-align:center;">
+      <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--green);">31</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px;">경기도 시·군</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 13 END ══ -->
+<section class="slide s0" data-i="12">
+  <div class="grid-bg"></div>
+  <div class="glow" style="left:50%;top:50%;transform:translate(-50%,-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(79,142,247,.2) 0%,transparent 65%);"></div>
+
+  <div style="text-align:center;position:relative;z-index:1;" class="a d1">
+    <div class="end-hex">위험도<br>대시보드</div>
+    <div class="ov" style="justify-content:center;margin-bottom:14px;">경기도 기상 기반 교통사고 위험도 분석</div>
+    <h1 class="th" style="font-size:clamp(34px,5vw,58px);margin-bottom:14px;">감사합니다</h1>
+    <p style="font-size:15px;color:var(--muted);">탐구 보고서 · 데이터 분석 + Flask 웹 대시보드</p>
+    <div class="chip-row" style="justify-content:center;margin-top:28px;">
+      <span class="chip">Python · pandas</span>
+      <span class="chip c">Flask</span>
+      <span class="chip g">Chart.js</span>
+      <span class="chip a">기상청 API</span>
+      <span class="chip p">자율주행</span>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const N = slides.length;
+let cur = 0, busy = false;
+
+const prog = document.getElementById('progress');
+const ctr  = document.getElementById('counter');
+const dotsEl = document.getElementById('dots');
+
+for (let i = 0; i < N; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0?' on':'');
+  d.addEventListener('click', () => go(i));
+  dotsEl.appendChild(d);
+}
+const dotEls = dotsEl.querySelectorAll('.dot');
+
+function ui() {
+  ctr.textContent = (cur+1)+' / '+N;
+  prog.style.width = ((cur+1)/N*100)+'%';
+  dotEls.forEach((d,i) => d.classList.toggle('on', i===cur));
+}
+
+function go(idx) {
+  if (idx===cur || busy) return;
+  busy = true;
+  const prev = slides[cur];
+  prev.classList.add('exit'); prev.classList.remove('active');
+  cur = idx;
+  const next = slides[cur];
+  next.querySelectorAll('.a').forEach(el => { el.style.animation='none'; el.offsetHeight; el.style.animation=''; });
+  next.classList.add('active'); next.classList.remove('exit');
+  ui();
+  onEnter(cur);
+  setTimeout(() => { prev.classList.remove('exit'); busy=false; }, 300);
+}
+
+function onEnter(i) {
+  if (i===6) initWeather();
+  if (i===7) animBars();
+  if (i===9) { initTime(); initPie(); }
+}
+
+const next = () => go(Math.min(cur+1, N-1));
+const prev = () => go(Math.max(cur-1, 0));
+document.getElementById('nr').addEventListener('click', next);
+document.getElementById('nl').addEventListener('click', prev);
+document.addEventListener('keydown', e => {
+  if(['ArrowRight','ArrowDown',' '].includes(e.key)){e.preventDefault();next();}
+  if(['ArrowLeft','ArrowUp'].includes(e.key)){e.preventDefault();prev();}
+});
+let tx=0;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();},{passive:true});
+ui();
+
+/* charts */
+const gc = 'rgba(255,255,255,.07)';
+const tc = 'rgba(255,255,255,.38)';
+const tf = {family:"'JetBrains Mono'",size:11};
+
+let wc,rc,tch,pc;
+
+function initWeather() {
+  if (wc) return;
+  wc = new Chart(document.getElementById('wChart'), {
+    type:'bar',
+    data:{
+      labels:['안개','비','없음'],
+      datasets:[{data:[61.5,41.7,33.8],backgroundColor:['rgba(248,113,113,.85)','rgba(79,142,247,.85)','rgba(100,100,100,.7)'],borderRadius:6,borderSkipped:false}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:900,easing:'easeOutQuart'},
+      plugins:{legend:{display:false}},
+      scales:{x:{grid:{color:gc},ticks:{color:tc,font:tf}},y:{min:0,max:100,grid:{color:gc},ticks:{color:tc,font:tf,stepSize:25}}}}
+  });
+}
+
+function animBars() {
+  const vals = [100,77.78,73.41,72.89,72.84,45.79];
+  ['t1','t2','t3','t4','t5','t6'].forEach((cls,i) => {
+    setTimeout(() => {
+      document.querySelector('.'+cls+'.mbf').style.width=vals[i]+'%';
+      document.querySelector('.'+cls+'.mbf').style.transition='width .8s ease';
+    }, 350);
+  });
+  if (rc) return;
+  rc = new Chart(document.getElementById('rChart'), {
+    type:'bar',
+    data:{
+      labels:['수원','화성','안산','고양','성남'],
+      datasets:[
+        {label:'빈도',data:[100,77.78,73.41,72.89,72.84],backgroundColor:'rgba(248,113,113,.85)',borderRadius:4,borderSkipped:false},
+        {label:'심각도',data:[100,81.58,74.14,76.85,74.66],backgroundColor:'rgba(79,142,247,.75)',borderRadius:4,borderSkipped:false}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:900,easing:'easeOutQuart'},
+      plugins:{legend:{display:false}},
+      scales:{x:{grid:{color:gc},ticks:{color:tc,font:tf}},y:{min:0,max:115,grid:{color:gc},ticks:{color:tc,font:tf,stepSize:25}}}}
+  });
+}
+
+function initTime() {
+  if (tch) return;
+  tch = new Chart(document.getElementById('tChart'), {
+    type:'bar',
+    data:{
+      labels:['18~20시','21~23시','00~02시','그 외'],
+      datasets:[{data:[85,70,80,30],backgroundColor:['rgba(248,113,113,.85)','rgba(251,191,36,.8)','rgba(248,113,113,.75)','rgba(100,100,100,.6)'],borderRadius:6,borderSkipped:false}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:900,easing:'easeOutQuart'},
+      plugins:{legend:{display:false}},
+      scales:{x:{grid:{color:gc},ticks:{color:tc,font:tf}},y:{min:0,max:100,grid:{color:gc},ticks:{color:tc,font:tf,stepSize:25}}}}
+  });
+}
+
+function initPie() {
+  if (pc) return;
+  pc = new Chart(document.getElementById('pChart'), {
+    type:'doughnut',
+    data:{
+      labels:['기상 40%','시간대 25%','사고빈도 25%','심각도 10%'],
+      datasets:[{data:[40,25,25,10],backgroundColor:['rgba(79,142,247,.85)','rgba(251,191,36,.8)','rgba(34,211,238,.8)','rgba(52,211,153,.8)'],borderWidth:0,hoverOffset:6}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:900},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.label}}},
+      cutout:'62%'}
+  });
+}
+</script>
+</body>
+</html>

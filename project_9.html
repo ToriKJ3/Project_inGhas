@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dojae — 현장실습 출결 자동화 앱</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --accent:   #5B8DEF;
+  --accent2:  #A78BFA;
+  --green:    #34D399;
+  --amber:    #FBBF24;
+  --red:      #F87171;
+  --bg0:      #080B12;
+  --bg1:      #0D1117;
+  --bg2:      #161B27;
+  --bg3:      #1E2535;
+  --line:     rgba(255,255,255,0.07);
+  --line2:    rgba(255,255,255,0.13);
+  --muted:    rgba(255,255,255,0.38);
+  --sub:      rgba(255,255,255,0.62);
+  --white:    #f0f4ff;
+  --mono:     'JetBrains Mono', monospace;
+  --sans:     'Noto Sans KR', sans-serif;
+  --content-max: 1120px;
+}
+
+html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); font-family:var(--sans); color:var(--white); -webkit-font-smoothing:antialiased; }
+
+/* ── DECK ── */
+#deck { width:100vw; height:100vh; position:relative; overflow:hidden; }
+
+.slide {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; justify-content:center;
+  padding:56px 80px;
+  opacity:0; pointer-events:none;
+  transform:translateX(50px);
+  transition:opacity .45s cubic-bezier(.4,0,.2,1), transform .45s cubic-bezier(.4,0,.2,1);
+  will-change:opacity,transform;
+  overflow:hidden;
+}
+.slide.active { opacity:1; pointer-events:all; transform:translateX(0); }
+.slide.exit   { opacity:0; transform:translateX(-50px); transition:opacity .28s ease, transform .28s ease; }
+
+/* slide themes */
+.s-cover  { background: var(--bg0); }
+.s-dark   { background: var(--bg1); }
+.s-mid    { background: var(--bg2); }
+.s-deep   { background: var(--bg0); }
+
+/* ── GRID BG (cover only) ── */
+.grid-bg {
+  position:absolute; inset:0; pointer-events:none; z-index:0;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size:72px 72px;
+  mask-image:radial-gradient(ellipse 75% 90% at 70% 50%, black 20%, transparent 75%);
+}
+.glow-blue {
+  position:absolute; pointer-events:none; z-index:0;
+  border-radius:50%;
+  background: radial-gradient(circle, rgba(91,141,239,.22) 0%, transparent 65%);
+}
+.glow-purple {
+  position:absolute; pointer-events:none; z-index:0;
+  border-radius:50%;
+  background: radial-gradient(circle, rgba(167,139,250,.15) 0%, transparent 65%);
+}
+.slide > :not(.grid-bg):not(.glow-blue):not(.glow-purple):not(.ghost-type):not(.deco-v) {
+  position:relative;
+  z-index:1;
+  width: min(100%, var(--content-max));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── CHROME ── */
+#progress { position:fixed; top:0; left:0; height:2px; background:var(--accent); transition:width .4s ease; z-index:200; }
+#counter  { position:fixed; bottom:26px; right:40px; font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:.06em; z-index:200; }
+#hint     { position:fixed; bottom:26px; left:80px; font-family:var(--mono); font-size:10px; color:rgba(255,255,255,.18); letter-spacing:.05em; z-index:200; }
+
+#dots { position:fixed; bottom:26px; left:50%; transform:translateX(-50%); display:flex; gap:7px; z-index:200; }
+.dot { width:5px; height:5px; border-radius:50%; background:var(--line2); cursor:pointer; transition:background .3s, transform .3s; }
+.dot.on { background:var(--accent); transform:scale(1.5); }
+
+.nav-btn {
+  position:fixed; top:50%; transform:translateY(-50%);
+  width:42px; height:42px; border-radius:50%;
+  background:rgba(255,255,255,0.04); border:1px solid var(--line2);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--muted); font-size:16px;
+  transition:background .2s, color .2s; z-index:200; user-select:none;
+}
+.nav-btn:hover { background:rgba(255,255,255,.10); color:var(--white); }
+#nav-l { left:18px; }
+#nav-r { right:18px; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+
+.a { opacity:0; }
+.slide.active .a { animation: fadeUp .55s ease forwards; }
+.d1{animation-delay:.04s!important}.d2{animation-delay:.13s!important}
+.d3{animation-delay:.22s!important}.d4{animation-delay:.31s!important}
+.d5{animation-delay:.40s!important}.d6{animation-delay:.49s!important}
+
+/* ── OVERLINE ── */
+.ov {
+  font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:14px;
+  display:flex; align-items:center; gap:10px;
+}
+.ov::before { content:''; display:inline-block; width:20px; height:1px; background:var(--accent); }
+
+/* ── TITLES ── */
+.t-hero {
+  font-size:clamp(44px,5.8vw,76px); font-weight:900; line-height:1.04;
+  letter-spacing:-.03em; margin-bottom:20px;
+}
+.t-hero em { font-style:normal; color:var(--accent); }
+
+.t-slide {
+  font-size:clamp(28px,3.6vw,48px); font-weight:800; line-height:1.12;
+  letter-spacing:-.025em; margin-bottom:10px;
+}
+.t-slide em { font-style:normal; color:var(--accent); }
+
+.sub { font-size:15px; color:var(--sub); line-height:1.65; max-width:580px; margin-bottom:36px; }
+.slide > .sub { max-width: var(--content-max); }
+
+/* ── CODE CHIP ── */
+.chip {
+  font-family:var(--mono); font-size:11px; letter-spacing:.04em;
+  padding:4px 10px; border-radius:4px;
+  background:rgba(91,141,239,.12); border:1px solid rgba(91,141,239,.28);
+  color:rgba(91,141,239,.9); display:inline-block;
+}
+.chip.green { background:rgba(52,211,153,.1); border-color:rgba(52,211,153,.25); color:rgba(52,211,153,.9); }
+.chip.amber { background:rgba(251,191,36,.1); border-color:rgba(251,191,36,.25); color:rgba(251,191,36,.9); }
+.chip.red   { background:rgba(248,113,113,.1); border-color:rgba(248,113,113,.25); color:rgba(248,113,113,.9); }
+.chip.purple{ background:rgba(167,139,250,.1); border-color:rgba(167,139,250,.25); color:rgba(167,139,250,.9); }
+
+.chip-row { display:flex; flex-wrap:wrap; gap:7px; margin-top:32px; }
+
+/* ── CARD GRID ── */
+.grid { display:grid; gap:14px; width:100%; }
+.g2 { grid-template-columns:1fr 1fr; }
+.g3 { grid-template-columns:1fr 1fr 1fr; }
+.g4 { grid-template-columns:repeat(4,1fr); }
+.split { display:grid; grid-template-columns:1fr 1fr; gap:28px; align-items:start; }
+.split-wide { grid-template-columns:3fr 2fr; }
+
+/* ── METRIC STRIP ── */
+.metric-strip {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  width:100%;
+}
+.metric-card {
+  background:rgba(255,255,255,.035);
+  border:1px solid var(--line2);
+  border-radius:10px;
+  padding:14px 16px;
+  text-align:center;
+  min-height:72px;
+}
+.metric-card strong {
+  display:block;
+  font-family:var(--mono);
+  font-size:clamp(20px,2.4vw,30px);
+  line-height:1;
+  margin-bottom:7px;
+}
+.metric-card span {
+  display:block;
+  font-size:11px;
+  color:var(--muted);
+  line-height:1.35;
+}
+
+.card {
+  background:var(--bg3); border:1px solid var(--line2);
+  border-radius:12px; padding:22px;
+  transition:border-color .25s;
+}
+.card:hover { border-color:rgba(255,255,255,.2); }
+.card-ov { font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:7px; }
+.card-t  { font-size:15px; font-weight:600; line-height:1.4; margin-bottom:6px; }
+.card-b  { font-size:13px; color:var(--sub); line-height:1.65; }
+
+/* ── ACCENT CARD ── */
+.card-accent { border-color:rgba(91,141,239,.35); background:rgba(91,141,239,.06); }
+.card-green  { border-color:rgba(52,211,153,.3);  background:rgba(52,211,153,.05); }
+.card-amber  { border-color:rgba(251,191,36,.3);  background:rgba(251,191,36,.05); }
+.card-red    { border-color:rgba(248,113,113,.3); background:rgba(248,113,113,.05); }
+
+/* ── HIGHLIGHT BOX ── */
+.hl {
+  border-left:3px solid var(--accent); padding:13px 17px;
+  background:rgba(91,141,239,.07); border-radius:0 8px 8px 0;
+  font-size:13.5px; line-height:1.7; color:var(--sub); margin:14px 0;
+}
+.hl.green  { border-left-color:var(--green);  background:rgba(52,211,153,.06); }
+.hl.amber  { border-left-color:var(--amber); background:rgba(251,191,36,.06); }
+.hl.red    { border-left-color:var(--red);   background:rgba(248,113,113,.06); }
+.hl.purple { border-left-color:var(--accent2);background:rgba(167,139,250,.06); }
+
+/* ── ROLE BADGE ── */
+.role-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:12px; font-weight:500;
+  padding:4px 12px 4px 8px; border-radius:20px;
+  border:1px solid var(--line2); background:var(--bg3);
+}
+.role-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+/* ── STEP LIST ── */
+.step { display:flex; gap:14px; margin-bottom:13px; align-items:flex-start; }
+.step-n {
+  width:26px; height:26px; border-radius:50%;
+  border:1px solid var(--line2); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-size:10px; color:var(--muted); margin-top:2px;
+}
+.step h4 { font-size:14px; font-weight:500; margin-bottom:2px; }
+.step p  { font-size:12.5px; color:var(--muted); line-height:1.55; }
+
+/* ── PROBLEM/SOLUTION ── */
+.ps-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+.ps-box { border-radius:10px; padding:14px 16px; }
+.ps-symptom { background:rgba(248,113,113,.07); border:1px solid rgba(248,113,113,.2); }
+.ps-solve   { background:rgba(52,211,153,.06);  border:1px solid rgba(52,211,153,.2); }
+.ps-label { font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px; }
+.ps-label.r { color:rgba(248,113,113,.7); }
+.ps-label.g { color:rgba(52,211,153,.7); }
+.ps-body { font-size:13px; line-height:1.6; color:var(--sub); }
+
+/* ── FLOW ── */
+.flow { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:18px 0; }
+.flow-box {
+  background:var(--bg3); border:1px solid var(--line2); border-radius:8px;
+  padding:10px 14px; font-size:12px; text-align:center; line-height:1.5;
+}
+.flow-box strong { display:block; font-family:var(--mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:2px; }
+.flow-sep { color:var(--muted); font-size:15px; }
+
+/* ── ARCH TABLE ── */
+.arch-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.04); font-size:13px; }
+.arch-row:last-child { border-bottom:none; }
+.arch-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.arch-name { font-weight:500; width:180px; flex-shrink:0; }
+.arch-desc { color:var(--muted); line-height:1.5; font-size:12.5px; }
+
+/* ── SECURITY GRID ── */
+.sec-item {
+  background:var(--bg3); border:1px solid var(--line2); border-radius:10px; padding:16px 18px;
+}
+.sec-item:hover { border-color:rgba(248,113,113,.3); }
+.sec-title { font-size:13.5px; font-weight:600; margin-bottom:5px; display:flex; align-items:center; gap:8px; }
+.sec-bullet { width:6px; height:6px; border-radius:50%; background:var(--red); flex-shrink:0; }
+.sec-body { font-size:12.5px; color:var(--muted); line-height:1.6; }
+.sec-fix { font-size:12px; color:rgba(52,211,153,.8); margin-top:7px; padding-top:7px; border-top:1px solid rgba(255,255,255,.05); }
+
+/* ── TIMELINE (evolution) ── */
+.tl-row { display:flex; gap:0; align-items:stretch; margin:20px 0; }
+.tl-item { flex:1; position:relative; padding:0 0 0 16px; }
+.tl-item::before {
+  content:''; position:absolute; left:0; top:8px;
+  width:calc(100% - 16px); height:1px; background:var(--line2);
+}
+.tl-item:first-child::before { width:calc(100% - 16px); }
+.tl-dot {
+  width:14px; height:14px; border-radius:50%;
+  border:2px solid var(--bg3); position:relative; z-index:1;
+  margin-bottom:10px; flex-shrink:0;
+}
+.tl-label { font-family:var(--mono); font-size:10px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-bottom:4px; }
+.tl-title { font-size:13px; font-weight:600; margin-bottom:4px; }
+.tl-body  { font-size:12px; color:var(--muted); line-height:1.55; }
+.tl-bad  .tl-dot { background:var(--red);   border-color:rgba(248,113,113,.3); }
+.tl-bad  .tl-item::before { background:rgba(248,113,113,.25); }
+.tl-mid  .tl-dot { background:var(--amber);  border-color:rgba(251,191,36,.3); }
+.tl-mid  .tl-item::before { background:rgba(251,191,36,.25); }
+.tl-good .tl-dot { background:var(--green); border-color:rgba(52,211,153,.3); }
+.tl-good .tl-item::before { background:rgba(52,211,153,.25); }
+
+/* ── END SLIDE ── */
+.end-logo {
+  width:80px; height:80px; border-radius:20px;
+  background:rgba(91,141,239,.15); border:1px solid rgba(91,141,239,.3);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-size:22px; font-weight:500; color:var(--accent);
+  margin:0 auto 28px; letter-spacing:.02em;
+}
+
+/* ── MINI BAR ── */
+.mbar { height:5px; border-radius:3px; background:rgba(255,255,255,.07); overflow:hidden; margin-top:8px; }
+.mbar-fill { height:100%; border-radius:3px; transition:width .8s ease .3s; }
+
+/* ── VERTICAL DECO ── */
+.deco-v { position:absolute; width:1px; height:100%; top:0; background:var(--line); pointer-events:none; z-index:0; }
+
+@media (max-width: 900px) {
+  .slide { padding:40px 28px; }
+  .grid.g2, .grid.g3, .grid.g4, .split, .metric-strip, .ps-row { grid-template-columns:1fr; }
+  .arch-name { width:130px; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="hint">← → 방향키 또는 클릭</div>
+<div id="counter">1 / 14</div>
+<div id="nav-l" class="nav-btn">&#8592;</div>
+<div id="nav-r" class="nav-btn">&#8594;</div>
+<div id="dots"></div>
+
+<div id="deck">
+
+<!-- ══ 01 COVER ══ -->
+<section class="slide s-cover active" data-i="0">
+  <div class="grid-bg"></div>
+  <div class="glow-blue" style="right:-80px;top:50%;transform:translateY(-50%);width:600px;height:600px;"></div>
+  <div class="glow-purple" style="right:180px;top:20%;width:300px;height:300px;"></div>
+
+  <div class="ov a d1">탐구 보고서 · 앱 개발 프로젝트</div>
+  <h1 class="t-hero a d2"><em>Dojae</em></h1>
+  <p style="font-size:clamp(18px,2.2vw,28px);font-weight:500;color:var(--sub);margin-bottom:12px;letter-spacing:-.01em;" class="a d3">현장실습 출결 자동화 앱</p>
+  <p style="font-size:15px;color:var(--muted);line-height:1.65;max-width:1120px;" class="a d4">Flutter · Firebase · OCR · Cloud Functions<br>학생·교사·관리자 통합 모바일 서비스</p>
+
+  <div class="chip-row a d5">
+    <span class="chip">Flutter / Dart</span>
+    <span class="chip">Firebase</span>
+    <span class="chip">Google ML Kit OCR</span>
+    <span class="chip green">Cloud Functions</span>
+    <span class="chip purple">Firestore Rules</span>
+    <span class="chip amber">Google Sheets API</span>
+  </div>
+
+  <!-- big ghost text -->
+  <div class="ghost-type" style="position:absolute;right:60px;bottom:40px;font-family:var(--mono);font-size:200px;font-weight:900;color:rgba(255,255,255,.025);line-height:1;pointer-events:none;z-index:0;letter-spacing:-.04em;">앱</div>
+</section>
+
+<!-- ══ 02 개발 동기 ══ -->
+<section class="slide s-dark" data-i="1">
+  <div class="deco-v" style="right:40%;"></div>
+
+  <div class="ov a d1">탐구 동기</div>
+  <h2 class="t-slide a d2">왜 만들었나</h2>
+
+  <div style="max-width:1120px;margin-top:6px;">
+    <!-- evolution timeline -->
+    <div class="a d3" style="display:flex;gap:0;align-items:stretch;margin:18px 0 24px;">
+      <div style="flex:1;padding-right:20px;border-right:1px solid var(--line2);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--red);flex-shrink:0;"></div>
+          <span class="chip red" style="font-size:10px;">V1 · Python exe</span>
+        </div>
+        <p style="font-size:13px;color:var(--sub);line-height:1.6;">스크린샷 → OCR → 스프레드시트 자동 입력. 동작은 했지만 수동 조작 필요, 다른 사람이 쓰기 어려움.</p>
+      </div>
+      <div style="flex:1;padding:0 20px;border-right:1px solid var(--line2);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--amber);flex-shrink:0;"></div>
+          <span class="chip amber" style="font-size:10px;">V2 · 카카오톡 챗봇</span>
+        </div>
+        <p style="font-size:13px;color:var(--sub);line-height:1.6;">AI 챗봇으로 개선했으나 서버용 PC 24시간 가동 필요 → 발열·소음 문제로 3일 만에 종료.</p>
+      </div>
+      <div style="flex:1;padding-left:20px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0;"></div>
+          <span class="chip green" style="font-size:10px;">V3 · Flutter 앱</span>
+        </div>
+        <p style="font-size:13px;color:var(--sub);line-height:1.6;">서버리스 클라우드 아키텍처. 별도 서버 없이 스마트폰에서 바로 사용 가능.</p>
+      </div>
+    </div>
+
+    <div class="hl a d4">
+      <strong>실제 문제</strong>: 도제 현장실습 반장으로서 매일 아침 학생들의 출퇴근 스크린샷을 수동으로 스프레드시트에 입력하는 반복 작업을 직접 경험. 교사·학생 모두에게 부담이었다.
+    </div>
+
+    <div class="grid g3 a d5" style="margin-top:16px;">
+      <div class="card" style="padding:16px;">
+        <div class="card-ov">문제</div>
+        <div class="card-t" style="font-size:14px;">매일 반복되는 수동 입력</div>
+        <div class="card-b" style="font-size:12px;">비콘 앱 스크린샷 → 반장이 시간 확인 → 스프레드시트 기입</div>
+      </div>
+      <div class="card card-accent" style="padding:16px;">
+        <div class="card-ov" style="color:rgba(91,141,239,.7);">해결 방향</div>
+        <div class="card-t" style="font-size:14px;">OCR + 클라우드 자동화</div>
+        <div class="card-b" style="font-size:12px;">스크린샷 업로드 한 번으로 출결 자동 기록</div>
+      </div>
+      <div class="card" style="padding:16px;">
+        <div class="card-ov">확장 목표</div>
+        <div class="card-t" style="font-size:14px;">통합 학교 플랫폼</div>
+        <div class="card-b" style="font-size:12px;">출결 + 공지 + 일정 + 채팅 한 앱으로</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 03 앱 개요 ══ -->
+<section class="slide s-mid" data-i="2">
+  <div class="ov a d1">앱 개요</div>
+  <h2 class="t-slide a d2">Dojae가 하는 일</h2>
+
+  <div class="grid g3 a d3" style="max-width:1120px;margin-top:20px;">
+    <div class="card" style="border-color:rgba(91,141,239,.3);padding:24px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <div class="role-dot" style="background:var(--accent);"></div>
+        <span style="font-size:14px;font-weight:600;">학생</span>
+      </div>
+      <div class="card-b" style="font-size:12.5px;line-height:1.8;">
+        스크린샷 업로드 → OCR 자동 인식<br>
+        출결 기록 조회<br>
+        이의신청 작성<br>
+        공지 확인 · 투표<br>
+        채팅 (학급방 · 문의방 · 1:1)
+      </div>
+    </div>
+    <div class="card" style="border-color:rgba(167,139,250,.3);padding:24px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <div class="role-dot" style="background:var(--accent2);"></div>
+        <span style="font-size:14px;font-weight:600;">교사</span>
+      </div>
+      <div class="card-b" style="font-size:12.5px;line-height:1.8;">
+        학생별 출결·지각·누락 확인<br>
+        출결 오류 직접 수정<br>
+        이의신청 처리<br>
+        공지 작성 · 확인 현황 관리<br>
+        교사 라운지 채팅
+      </div>
+    </div>
+    <div class="card" style="border-color:rgba(251,191,36,.3);padding:24px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <div class="role-dot" style="background:var(--amber);"></div>
+        <span style="font-size:14px;font-weight:600;">관리자</span>
+      </div>
+      <div class="card-b" style="font-size:12.5px;line-height:1.8;">
+        계정·공지·일정·출결 전체 관리<br>
+        엑셀 / Google Sheets 연동<br>
+        졸업생·탈퇴 데이터 정리<br>
+        마이그레이션 함수 실행<br>
+        채팅 문의 관리
+      </div>
+    </div>
+  </div>
+
+  <div class="metric-strip a d4" style="max-width:1120px;margin-top:14px;">
+    <div class="metric-card">
+      <strong style="color:var(--accent);">5</strong>
+      <span>채팅 유형</span>
+    </div>
+    <div class="metric-card">
+      <strong style="color:var(--green);">9</strong>
+      <span>주요 기술·API 연동</span>
+    </div>
+    <div class="metric-card">
+      <strong style="color:var(--amber);">15+</strong>
+      <span>발견·개선 문제</span>
+    </div>
+    <div class="metric-card">
+      <strong style="color:var(--accent2);">iOS/AOS</strong>
+      <span>크로스 플랫폼</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 04 기술 스택 ══ -->
+<section class="slide s-dark" data-i="3">
+  <div class="ov a d1">사용 기술</div>
+  <h2 class="t-slide a d2">기술 스택</h2>
+
+  <div class="split a d3" style="max-width:1120px;margin-top:16px;gap:20px;">
+    <div>
+      <div class="arch-row">
+        <div class="arch-icon" style="background:rgba(91,141,239,.15);">📱</div>
+        <div class="arch-name"><span class="chip" style="font-size:11px;">Flutter / Dart</span></div>
+        <div class="arch-desc">iOS · Android 크로스 플랫폼, Provider 상태 관리</div>
+      </div>
+      <div class="arch-row">
+        <div class="arch-icon" style="background:rgba(251,191,36,.12);">🔐</div>
+        <div class="arch-name"><span class="chip amber" style="font-size:11px;">Firebase Auth</span></div>
+        <div class="arch-desc">Google 로그인 및 사용자 인증</div>
+      </div>
+      <div class="arch-row">
+        <div class="arch-icon" style="background:rgba(52,211,153,.12);">🗄️</div>
+        <div class="arch-name"><span class="chip green" style="font-size:11px;">Cloud Firestore</span></div>
+        <div class="arch-desc">출결·공지·채팅·일정 NoSQL 저장</div>
+      </div>
+      <div class="arch-row">
+        <div class="arch-icon" style="background:rgba(167,139,250,.12);">⚡</div>
+        <div class="arch-name"><span class="chip purple" style="font-size:11px;">Cloud Functions</span></div>
+        <div class="arch-desc">서버 검증, 자동화, Sheets 연동 (Node.js)</div>
+      </div>
+    </div>
+    <div>
+      <div class="arch-row">
+        <div class="arch-icon" style="background:rgba(248,113,113,.12);">👁️</div>
+        <div class="arch-name"><span class="chip red" style="font-size:11px;">ML Kit OCR</span></div>
+        <div class="arch-desc">Google ML Kit Text Recognition, 다단계 스캔</div>
+      </div>
+      <div class="arch-row">
+        <div class="arch-icon" style="background:rgba(91,141,239,.12);">🔔</div>
+        <div class="arch-name"><span class="chip" style="font-size:11px;">FCM</span></div>
+        <div class="arch-desc">Firebase Cloud Messaging 푸시 알림</div>
+      </div>
+      <div class="arch-row">
+        <div class="arch-icon" style="background:rgba(52,211,153,.12);">📊</div>
+        <div class="arch-name"><span class="chip green" style="font-size:11px;">Sheets API</span></div>
+        <div class="arch-desc">출결 데이터 스프레드시트 자동 동기화</div>
+      </div>
+      <div class="arch-row">
+        <div class="arch-icon" style="background:rgba(251,191,36,.12);">🛡️</div>
+        <div class="arch-name"><span class="chip amber" style="font-size:11px;">Security Rules</span></div>
+        <div class="arch-desc">Firestore / Storage 역할별 접근 제어</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 05 OCR 핵심 구현 ══ -->
+<section class="slide s-mid" data-i="4">
+  <div class="ov a d1">핵심 구현 · OCR</div>
+  <h2 class="t-slide a d2">출결 인식 파이프라인</h2>
+
+  <div class="split a d3" style="max-width:1120px;margin-top:16px;align-items:start;">
+    <div>
+      <div class="flow" style="flex-direction:column;align-items:stretch;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:30px;height:30px;border-radius:50%;background:rgba(91,141,239,.15);border:1px solid rgba(91,141,239,.3);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--accent);flex-shrink:0;">1</div>
+          <div class="card" style="flex:1;padding:12px 16px;">
+            <div class="card-ov">스캔 전략</div>
+            <div class="card-b" style="font-size:12.5px;">중앙 영역 → 하단 영역 → 전체 이미지 순서로 다단계 스캔. 상태바 시간 오인식 방지.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:30px;height:30px;border-radius:50%;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--accent2);flex-shrink:0;">2</div>
+          <div class="card" style="flex:1;padding:12px 16px;">
+            <div class="card-ov">파싱 병합</div>
+            <div class="card-b" style="font-size:12.5px;">layout 기반 파싱 + raw text 기반 파싱 병합. OCR 행 토큰을 좌표 기준으로 재조합.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:30px;height:30px;border-radius:50%;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.25);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--green);flex-shrink:0;">3</div>
+          <div class="card" style="flex:1;padding:12px 16px;">
+            <div class="card-ov">정규화</div>
+            <div class="card-b" style="font-size:12.5px;font-family:var(--mono);">O↔0, .↔: 보정<br>"09 : 31" → "09:31"<br>"O7.48" → "07:48"</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card card-accent" style="margin-bottom:12px;padding:18px;">
+        <div class="card-ov" style="color:rgba(91,141,239,.7);">iOS 이미지 처리</div>
+        <div class="card-b" style="font-size:13px;">HEIC 포맷 · EXIF orientation 문제 →<br><code style="font-family:var(--mono);color:var(--accent);font-size:12px;">imageQuality: 95</code> 설정으로 JPEG 변환 및 회전 정보 적용</div>
+      </div>
+      <div class="card" style="padding:18px;">
+        <div class="card-ov">회귀 방지 테스트</div>
+        <div class="card-b" style="font-size:13px;font-family:var(--mono);line-height:1.8;color:rgba(52,211,153,.8);">
+          test/attendance_utils_test.dart<br>
+          <span style="color:var(--muted);">다양한 오인식 케이스 커버</span>
+        </div>
+      </div>
+      <div class="hl green" style="margin-top:12px;font-size:13px;">
+        <strong>핵심 설계</strong>: 단일 스캔의 오인식률 한계를 다단계 스캔 + 좌표 기반 재조합으로 극복
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 06 출결 저장 구조 ══ -->
+<section class="slide s-dark" data-i="5">
+  <div class="ov a d1">핵심 구현 · 저장 구조</div>
+  <h2 class="t-slide a d2">Firestore 트랜잭션 설계</h2>
+
+  <div class="split a d3" style="max-width:1120px;margin-top:16px;align-items:start;">
+    <div>
+      <div class="card" style="padding:22px;margin-bottom:12px;">
+        <div class="card-ov">Deterministic Document ID</div>
+        <div style="font-family:var(--mono);font-size:15px;color:var(--accent);margin:10px 0;padding:10px 14px;background:rgba(91,141,239,.08);border-radius:6px;border:1px solid rgba(91,141,239,.2);">
+          $&#123;uid&#125;_$&#123;yyyy-MM-dd&#125;
+        </div>
+        <div class="card-b" style="font-size:13px;">동일 학생이 같은 날 다른 기기에서 동시에 업로드해도 중복 문서 생성 없음</div>
+      </div>
+      <div class="card" style="padding:22px;">
+        <div class="card-ov">원자적 처리 흐름</div>
+        <div class="step" style="margin-top:10px;">
+          <div class="step-n">1</div>
+          <div><p style="font-size:13px;color:var(--sub);">트랜잭션으로 기존 문서 확인 + 쓰기를 단일 원자 작업으로 처리</p></div>
+        </div>
+        <div class="step">
+          <div class="step-n">2</div>
+          <div><p style="font-size:13px;color:var(--sub);">입실 기록 있으면 자동으로 퇴실 기록으로 이어 업데이트</p></div>
+        </div>
+        <div class="step">
+          <div class="step-n">3</div>
+          <div><p style="font-size:13px;color:var(--sub);">지각 여부 및 근무 시간 자동 계산 후 저장</p></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="hl" style="margin-bottom:12px;">
+        <strong>설계 의도</strong>: OCR 처리 후 재사용 가치 없는 인증 사진은 서버에 저장하지 않음. Storage 사용량의 약 80%를 차지하던 출결 사진 저장을 제거 + 개인정보 최소화.
+      </div>
+      <div class="card" style="padding:18px;">
+        <div class="card-ov">Cloud Functions 자동화</div>
+        <div class="card-b" style="font-size:12.5px;line-height:1.9;">
+          출결 로그 변경 → Google Sheets 동기화<br>
+          서버 검증 및 시간 형식 정규화<br>
+          학급방·교사 라운지 자동 생성·멤버 동기화<br>
+          채팅 lastMessage / unreadCount 재계산<br>
+          졸업생·탈퇴 사용자 데이터 자동 정리
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 07 보안 규칙 ══ -->
+<section class="slide s-mid" data-i="6">
+  <div class="ov a d1">보안 설계</div>
+  <h2 class="t-slide a d2">Firestore Security Rules</h2>
+
+  <div class="split a d3" style="max-width:1120px;margin-top:16px;align-items:start;">
+    <div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px;font-family:var(--mono);">역할별 접근 제어</div>
+      <div class="card" style="padding:16px;margin-bottom:10px;border-color:rgba(91,141,239,.3);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <div class="role-dot" style="background:var(--accent);"></div>
+          <span style="font-size:13px;font-weight:500;">학생</span>
+        </div>
+        <div class="card-b" style="font-size:12.5px;">본인 출결만 생성·조회 가능. 타인 데이터 접근 불가.</div>
+        <div class="mbar"><div class="mbar-fill sid1" style="width:0%;background:var(--accent);"></div></div>
+      </div>
+      <div class="card" style="padding:16px;margin-bottom:10px;border-color:rgba(167,139,250,.3);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <div class="role-dot" style="background:var(--accent2);"></div>
+          <span style="font-size:13px;font-weight:500;">교사</span>
+        </div>
+        <div class="card-b" style="font-size:12.5px;">담당 범위 내 출결 관리. 공지 작성 권한.</div>
+        <div class="mbar"><div class="mbar-fill sid2" style="width:0%;background:var(--accent2);"></div></div>
+      </div>
+      <div class="card" style="padding:16px;border-color:rgba(251,191,36,.3);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <div class="role-dot" style="background:var(--amber);"></div>
+          <span style="font-size:13px;font-weight:500;">관리자</span>
+        </div>
+        <div class="card-b" style="font-size:12.5px;">전체 데이터 접근. admin SDK 전용 작업 포함.</div>
+        <div class="mbar"><div class="mbar-fill sid3" style="width:0%;background:var(--amber);"></div></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px;font-family:var(--mono);">검증 항목</div>
+      <div class="card" style="padding:16px;margin-bottom:10px;">
+        <div class="card-ov">출결 문서 필드 검증</div>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--accent);line-height:1.9;margin-top:6px;">
+          work_date · check_in · check_out<br>
+          photo_url · createdAt<br>
+          <span style="color:var(--muted);">타입 + HH:mm 형식 강제</span>
+        </div>
+      </div>
+      <div class="card" style="padding:16px;">
+        <div class="card-ov">채팅 문서 검증</div>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--accent);line-height:1.9;margin-top:6px;">
+          chatId 형식<br>
+          참여자 수 상한<br>
+          unreadCount · participantNames<br>
+          <span style="color:var(--muted);">isSystem 클라이언트 생성 차단</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 08 채팅 시스템 ══ -->
+<section class="slide s-dark" data-i="7">
+  <div class="ov a d1">채팅 시스템</div>
+  <h2 class="t-slide a d2">채팅 기능 구조</h2>
+
+  <div class="split a d3" style="max-width:1120px;margin-top:16px;align-items:start;">
+    <div>
+      <div class="grid g2" style="gap:10px;margin-bottom:12px;">
+        <div class="card" style="padding:14px;">
+          <div class="card-ov">채팅 유형</div>
+          <div class="card-b" style="font-size:12.5px;line-height:1.9;">1:1 채팅<br>학급 단체방<br>교사 라운지<br>관리자 문의방<br>커스텀 그룹</div>
+        </div>
+        <div class="card" style="padding:14px;">
+          <div class="card-ov">세부 기능</div>
+          <div class="card-b" style="font-size:12.5px;line-height:1.9;">읽음 처리<br>반응 · 상단 고정<br>알림 끄기<br>이미지 전송<br>그룹 공지</div>
+        </div>
+      </div>
+      <div class="hl amber" style="font-size:13px;">
+        <strong>초대 흐름</strong>: 그룹 생성 시 본인만 participants에 포함 → <code style="font-family:var(--mono);font-size:12px;color:var(--amber);">chat_invites</code> 문서로 초대 발송 → 수락 시 admin SDK로 추가
+      </div>
+    </div>
+    <div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px;font-family:var(--mono);">Cloud Functions 위임 처리</div>
+      <div class="step">
+        <div class="step-n" style="border-color:rgba(52,211,153,.3);color:var(--green);">✓</div>
+        <div><h4 style="font-size:13px;">lastMessage / lastMessageTime 갱신</h4><p>onMessageCreated, onMessageEditedOrDeleted가 서버에서 처리</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n" style="border-color:rgba(52,211,153,.3);color:var(--green);">✓</div>
+        <div><h4 style="font-size:13px;">시스템 메시지 자동 생성</h4><p>나가기·문의해결 메시지를 Cloud Functions가 생성, 클라이언트 위조 차단</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n" style="border-color:rgba(52,211,153,.3);color:var(--green);">✓</div>
+        <div><h4 style="font-size:13px;">기본 그룹 자동 생성</h4><p>ensureDefaultGroupChats가 admin SDK로 학급방·교사 라운지 생성·동기화</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n" style="border-color:rgba(52,211,153,.3);color:var(--green);">✓</div>
+        <div><h4 style="font-size:13px;">unreadCount 본인만 리셋</h4><p>본인 uid 하위 키만 변경 허용, 타인 조작 차단</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 09 핵심 문제 : iOS 무한 로딩 ══ -->
+<section class="slide s-mid" data-i="8">
+  <div class="ov a d1">문제 해결 · 핵심 사례</div>
+  <h2 class="t-slide a d2">iOS <em>무한 로딩</em> 문제</h2>
+
+  <div class="split a d3" style="max-width:1120px;margin-top:18px;align-items:start;">
+    <div>
+      <div class="ps-row">
+        <div class="ps-box ps-symptom">
+          <div class="ps-label r">증상</div>
+          <div class="ps-body">iPhone에서 사진 인식 후 로딩이 끝나지 않음. Firestore에는 데이터가 정상 저장됨.</div>
+        </div>
+        <div class="ps-box ps-solve">
+          <div class="ps-label g">원인</div>
+          <div class="ps-body">Firestore 트랜잭션 성공 후 Storage 업로드 단계에서 iOS가 멈춤.</div>
+        </div>
+      </div>
+
+      <div class="step" style="margin-top:14px;">
+        <div class="step-n" style="background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.3);color:var(--amber);">1차</div>
+        <div><h4 style="font-size:13px;">임시 해결: 타임아웃 추가</h4><p>Storage 업로드에 timeout 적용으로 무한 대기 차단</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n" style="background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.25);color:var(--red);">발견</div>
+        <div><h4 style="font-size:13px;">Storage 사용량 80%가 출결 사진</h4><p>OCR 후 재사용 가치 없는 사진이 비용의 대부분을 차지</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n" style="background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.25);color:var(--green);">최종</div>
+        <div><h4 style="font-size:13px;">출결 사진 업로드 자체 제거</h4><p>OCR 입력으로만 사용, 서버 저장 중단</p></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card card-green" style="padding:20px;margin-bottom:12px;">
+        <div class="card-ov" style="color:rgba(52,211,153,.7);">한 번의 결정으로 해결된 것들</div>
+        <div class="step" style="margin-top:10px;">
+          <div class="step-n" style="border-color:rgba(52,211,153,.3);color:var(--green);">1</div>
+          <div><p style="font-size:13px;color:var(--sub);">iOS 무한 로딩 문제</p></div>
+        </div>
+        <div class="step">
+          <div class="step-n" style="border-color:rgba(52,211,153,.3);color:var(--green);">2</div>
+          <div><p style="font-size:13px;color:var(--sub);">출결 사진 신규 저장 제거</p></div>
+        </div>
+        <div class="step">
+          <div class="step-n" style="border-color:rgba(52,211,153,.3);color:var(--green);">3</div>
+          <div><p style="font-size:13px;color:var(--sub);">개인정보 저장 최소화</p></div>
+        </div>
+      </div>
+      <div class="hl" style="font-size:13px;">
+        <strong>배운 점</strong>: 기능이 동작하는 것과 비용·개인정보가 적절한 것은 별개의 문제다. 저장할 필요 없는 임시 데이터는 서버에 남기지 않는 것이 맞다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 10 보안 취약점 발견 ══ -->
+<section class="slide s-dark" data-i="9">
+  <div class="ov a d1">문제 해결 · 보안</div>
+  <h2 class="t-slide a d2">스스로 발견한 <em>보안 취약점</em></h2>
+  <p class="sub a d2" style="margin-bottom:16px;">정상 사용자 흐름은 유지하면서 악용 가능성은 차단</p>
+
+  <div class="grid g3 a d3" style="max-width:1120px;">
+    <div class="sec-item">
+      <div class="sec-title"><div class="sec-bullet"></div>채팅 미리보기 위조</div>
+      <div class="sec-body">lastMessage·lastMessageTime을 클라이언트가 직접 갱신하면 채팅방 미리보기 조작 가능</div>
+      <div class="sec-fix">→ Cloud Functions으로 갱신 권한 이전</div>
+    </div>
+    <div class="sec-item">
+      <div class="sec-title"><div class="sec-bullet"></div>시스템 메시지 위조</div>
+      <div class="sec-body">isSystem:true 메시지를 클라이언트가 임의 생성 가능 → 가짜 퇴장·삭제 안내</div>
+      <div class="sec-fix">→ 시스템 메시지 생성을 Functions 전용으로 제한</div>
+    </div>
+    <div class="sec-item">
+      <div class="sec-title"><div class="sec-bullet"></div>강제 그룹 참여</div>
+      <div class="sec-body">그룹 생성 시 participants에 타인을 바로 추가 → 원치 않는 그룹에 강제 입장</div>
+      <div class="sec-fix">→ chat_invites 문서 기반 초대 수락 흐름으로 전환</div>
+    </div>
+    <div class="sec-item">
+      <div class="sec-title"><div class="sec-bullet"></div>기본 학급방 권한</div>
+      <div class="sec-body">학생이 먼저 학급방 생성 시 구성원 임의 설정 가능</div>
+      <div class="sec-fix">→ ensureDefaultGroupChats (admin SDK 전용) 으로 이전</div>
+    </div>
+    <div class="sec-item">
+      <div class="sec-title"><div class="sec-bullet"></div>개인정보 노출</div>
+      <div class="sec-body">비참여자도 학급방 문서의 participantNames 조회 가능</div>
+      <div class="sec-fix">→ Firestore rules 참여자 전용으로 축소</div>
+    </div>
+    <div class="sec-item">
+      <div class="sec-title"><div class="sec-bullet"></div>출결 중복 저장</div>
+      <div class="sec-body">다른 기기 동시 업로드 시 중복 문서 생성 가능</div>
+      <div class="sec-fix">→ Deterministic ID + Firestore 트랜잭션으로 원자적 처리</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 11 데이터 정합성 ══ -->
+<section class="slide s-mid" data-i="10">
+  <div class="ov a d1">문제 해결 · 데이터 정합성</div>
+  <h2 class="t-slide a d2">기타 해결 문제들</h2>
+
+  <div class="grid g2 a d3" style="max-width:1120px;margin-top:18px;">
+    <div>
+      <div class="ps-row" style="margin-bottom:12px;">
+        <div class="ps-box ps-symptom">
+          <div class="ps-label r">시간 형식 혼재</div>
+          <div class="ps-body" style="font-family:var(--mono);font-size:12px;">"9:00" vs "09:00"<br>Rules는 두 자리 요구</div>
+        </div>
+        <div class="ps-box ps-solve">
+          <div class="ps-label g">해결</div>
+          <div class="ps-body" style="font-family:var(--mono);font-size:12px;">_normalizeUploadTime<br>+ legacy 정규화 함수</div>
+        </div>
+      </div>
+      <div class="ps-row">
+        <div class="ps-box ps-symptom">
+          <div class="ps-label r">Rules ↔ 클라이언트 충돌</div>
+          <div class="ps-body" style="font-size:12.5px;">정상 클라이언트 동작이 Rules에 막히는 경우 발생</div>
+        </div>
+        <div class="ps-box ps-solve">
+          <div class="ps-label g">해결</div>
+          <div class="ps-body" style="font-size:12.5px;">후속 처리를 Cloud Functions으로 이전, admin SDK 권위로 처리</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="padding:18px;margin-bottom:12px;">
+        <div class="card-ov">테스트 및 검증</div>
+        <div class="step" style="margin-top:8px;">
+          <div class="step-n" style="font-size:9px;">CLI</div>
+          <div><p style="font-family:var(--mono);font-size:12px;color:var(--accent);">flutter analyze</p><p style="font-size:12px;color:var(--muted);">정적 분석, 타입 오류 탐지</p></div>
+        </div>
+        <div class="step">
+          <div class="step-n" style="font-size:9px;">TEST</div>
+          <div><p style="font-family:var(--mono);font-size:12px;color:var(--accent);">flutter test</p><p style="font-size:12px;color:var(--muted);">OCR 파싱 + 출결 계산 단위 테스트</p></div>
+        </div>
+        <div class="step">
+          <div class="step-n" style="font-size:9px;">EMU</div>
+          <div><p style="font-family:var(--mono);font-size:12px;color:var(--accent);">Firestore emulator</p><p style="font-size:12px;color:var(--muted);">Security Rules 로드 및 동작 검증</p></div>
+        </div>
+      </div>
+      <div class="hl purple" style="font-size:13px;">
+        Flutter SPM 경고 (pdfx, mlkit): 즉시 빌드 실패 아님. 현재 CocoaPods 기반 동작 중, 플러그인 업데이트 검토 예정.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 12 결론 ══ -->
+<section class="slide s-dark" data-i="11">
+  <div class="ov a d1">결론</div>
+  <h2 class="t-slide a d2">탐구 요약</h2>
+
+  <div class="grid g3 a d3" style="max-width:1120px;margin-top:18px;">
+    <div class="card card-accent" style="padding:20px;">
+      <div class="card-ov" style="color:rgba(91,141,239,.7);">기획 · 설계</div>
+      <div class="card-t">실제 문제에서 출발</div>
+      <div class="card-b" style="font-size:12.5px;">Python exe → 챗봇 → 앱의 실패를 거치며 서버리스 아키텍처 채택. 사용자 역할별 화면과 권한 구조 직접 설계.</div>
+    </div>
+    <div class="card card-green" style="padding:20px;">
+      <div class="card-ov" style="color:rgba(52,211,153,.7);">구현 · 통합</div>
+      <div class="card-t">풀스택 서비스 완성</div>
+      <div class="card-b" style="font-size:12.5px;">Flutter + Firebase 9개 서비스 + OCR + Google Sheets API. 단순 화면 구현을 넘어 전체 서비스 아키텍처 직접 구축.</div>
+    </div>
+    <div class="card" style="padding:20px;border-color:rgba(248,113,113,.3);">
+      <div class="card-ov" style="color:rgba(248,113,113,.7);">운영 · 개선</div>
+      <div class="card-t">15+ 문제 직접 발견·해결</div>
+      <div class="card-b" style="font-size:12.5px;">보안·비용·개인정보·정합성을 함께 고려. 기능이 동작하는 것과 안전하게 운영되는 것이 다르다는 것을 체감.</div>
+    </div>
+  </div>
+
+  <div class="hl a d4" style="max-width:1120px;margin-top:16px;font-size:14px;">
+    소프트웨어가 <strong>실제 공동체의 업무 방식과 비용 구조를 바꿀 수 있음</strong>을 직접 경험하였다. 이 경험이 소프트웨어·컴퓨터공학 분야 진로를 더욱 확고히 하는 계기가 되었다.
+  </div>
+</section>
+
+<!-- ══ 13 향후 계획 ══ -->
+<section class="slide s-mid" data-i="12">
+  <div class="ov a d1">향후 계획</div>
+  <h2 class="t-slide a d2">앞으로 개선할 것들</h2>
+
+  <div class="split a d3" style="max-width:1120px;margin-top:20px;align-items:start;">
+    <div>
+      <div class="step">
+        <div class="step-n">1</div>
+        <div><h4 style="font-size:14px;">Firestore Rules 행동 기반 테스트</h4><p>자동화된 시나리오 테스트로 규칙 변경 시 회귀 방지</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div><h4 style="font-size:14px;">OCR 테스트 케이스 확장</h4><p>실패 사례 수집 → 파싱 테스트 케이스 지속 추가</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div><h4 style="font-size:14px;">Cloud Functions 모니터링</h4><p>스케줄 작업 실패 알림 및 로그 시스템 구축</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n">4</div>
+        <div><h4 style="font-size:14px;">채팅 초대 권한 정책 명확화</h4><p>전체 멤버 초대 가능 vs 관리자만 중 하나로 정리</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n">5</div>
+        <div><h4 style="font-size:14px;">SPM 미지원 플러그인 업데이트</h4><p>pdfx, mlkit 등 CocoaPods → SPM 마이그레이션 검토</p></div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="padding:20px;border-color:rgba(91,141,239,.3);">
+        <div class="card-ov" style="color:rgba(91,141,239,.7);">생기부 요약</div>
+        <p style="font-size:13.5px;line-height:1.8;color:var(--sub);">
+          Flutter와 Firebase를 활용해 도제 현장실습 출결을 자동화하는 앱을 기획·개발하였다. OCR로 출결 시간을 자동 추출하고, Firestore 보안 규칙으로 역할별 접근 권한을 분리하며, Cloud Functions으로 서버 자동화를 구현하였다.
+        </p>
+        <p style="font-size:13.5px;line-height:1.8;color:var(--sub);margin-top:10px;">
+          운영 중 발생한 iOS 무한 로딩·OCR 오인식·보안 취약점 등 15건 이상을 직접 발견·분석하여 보안·비용·개인정보를 함께 고려하는 방향으로 개선하였다.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 14 END ══ -->
+<section class="slide s-cover" data-i="13">
+  <div class="grid-bg"></div>
+  <div class="glow-blue" style="left:50%;top:50%;transform:translate(-50%,-50%);width:500px;height:500px;opacity:.6;"></div>
+
+  <div style="text-align:center;position:relative;z-index:1;" class="a d1">
+    <div class="end-logo">DJ</div>
+    <div class="ov" style="justify-content:center;margin-bottom:14px;">현장실습 출결 자동화 앱</div>
+    <h1 class="t-hero" style="font-size:clamp(36px,5vw,60px);margin-bottom:14px;">감사합니다</h1>
+    <p style="font-size:15px;color:var(--muted);">탐구 보고서 · Dojae 앱 개발 프로젝트</p>
+    <div class="chip-row" style="justify-content:center;margin-top:28px;">
+      <span class="chip">Flutter</span>
+      <span class="chip">Firebase</span>
+      <span class="chip green">OCR</span>
+      <span class="chip purple">Security Rules</span>
+      <span class="chip amber">Cloud Functions</span>
+    </div>
+  </div>
+</section>
+
+</div><!-- #deck -->
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const N = slides.length;
+let cur = 0, busy = false;
+
+const prog = document.getElementById('progress');
+const ctr  = document.getElementById('counter');
+const dotsEl = document.getElementById('dots');
+
+for (let i = 0; i < N; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' on' : '');
+  d.addEventListener('click', () => go(i));
+  dotsEl.appendChild(d);
+}
+const dotEls = dotsEl.querySelectorAll('.dot');
+
+function ui() {
+  ctr.textContent = (cur + 1) + ' / ' + N;
+  prog.style.width = ((cur + 1) / N * 100) + '%';
+  dotEls.forEach((d, i) => d.classList.toggle('on', i === cur));
+}
+
+function go(idx) {
+  if (idx === cur || busy) return;
+  busy = true;
+  const prev = slides[cur];
+  prev.classList.add('exit');
+  prev.classList.remove('active');
+  cur = idx;
+  const next = slides[cur];
+  next.querySelectorAll('.a').forEach(el => { el.style.animation='none'; el.offsetHeight; el.style.animation=''; });
+  next.classList.add('active');
+  next.classList.remove('exit');
+  ui();
+  onSlideEnter(cur);
+  setTimeout(() => { prev.classList.remove('exit'); busy = false; }, 320);
+}
+
+function onSlideEnter(i) {
+  if (i === 6) {
+    setTimeout(() => {
+      [['sid1',60],['sid2',75],['sid3',100]].forEach(([id,w]) => {
+        const el = document.querySelector('.'+id);
+        if (el) { el.style.transition='width .8s ease'; el.style.width=w+'%'; }
+      });
+    }, 350);
+  }
+}
+
+const next = () => go(Math.min(cur + 1, N - 1));
+const prev = () => go(Math.max(cur - 1, 0));
+
+document.getElementById('nav-r').addEventListener('click', next);
+document.getElementById('nav-l').addEventListener('click', prev);
+
+document.addEventListener('keydown', e => {
+  if (['ArrowRight','ArrowDown',' '].includes(e.key)) { e.preventDefault(); next(); }
+  if (['ArrowLeft','ArrowUp'].includes(e.key))         { e.preventDefault(); prev(); }
+});
+
+let tx = 0;
+document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive:true });
+document.addEventListener('touchend',   e => {
+  const dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 50) dx < 0 ? next() : prev();
+}, { passive:true });
+
+ui();
+</script>
+</body>
+</html>
