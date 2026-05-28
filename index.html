@@ -678,7 +678,7 @@
   <span class="logo">Project Plan 2026</span>
   <div class="nav-controls">
     <button class="nav-btn" onclick="prevSlide()">← 이전</button>
-    <span class="slide-counter" id="counter">1 / 22</span>
+    <span class="slide-counter" id="counter">1 / 24</span>
     <button class="nav-btn" onclick="nextSlide()">다음 →</button>
   </div>
 </nav>
@@ -885,7 +885,7 @@
         <div class="proj-title">교통사고·기상 공공데이터<br>위험도 분석 프로그램 개발</div>
         <div class="proj-subject" style="background:rgba(0,198,100,0.12);border-color:rgba(0,198,100,0.25);color:#34d399;">📚 응용프로그래밍 개발</div>
         <div class="proj-desc">
-          공공 교통사고 데이터와 기상 데이터를 수집하여 시간대·지역·날씨 조건별 사고 빈도를 분석. 조건별 가중치를 설정하여 사고 위험도 점수를 계산하는 알고리즘을 설계하고 프로그램으로 구현한다.
+          한국도로교통공단 교통사고 CSV와 기상청 ASOS 시간자료를 결합해, 지역·시간·날씨 조건별 위험도를 0~100점으로 산출하는 분석 프로그램을 구현했다. 사고 CSV는 지역 기준값, 기상 API는 시간별 위험도 계산에 분리 적용했다.
         </div>
         <div class="tag-row" style="margin-top:12px;">
           <span class="tag t-green">서강대</span><span class="tag t-green">단국대</span><span class="tag t-green">가천대</span><span class="tag t-green">건국대</span><span class="tag t-green">연세대</span>
@@ -894,7 +894,7 @@
       <div class="proj-right">
         <div class="info-row delay-1">
           <div class="info-row-label">주요 기능</div>
-          <div class="info-row-val">데이터 수집 · 전처리 · 결측치 처리 · 시간대/지역/기상별 분류 · 위험도 점수화 · 그래프·표 시각화</div>
+          <div class="info-row-val">KOROAD CSV 전처리 · ASOS API 수집 · 경기도 31개 시군 정규화 · 가중치 산식 · CSV/그래프 출력</div>
         </div>
         <div class="info-row delay-2">
           <div class="info-row-label">강조 역량</div>
@@ -902,24 +902,87 @@
         </div>
         <div class="info-row delay-3">
           <div class="info-row-label">수학적 요소</div>
-          <div class="info-row-val">가중치 설계 · 비율 계산 · 빈도 분석 · 확률 개념 — 복잡한 수학 지식 응용 강조</div>
+          <div class="info-row-val">기상 40% · 시간대 25% · 사고빈도 25% · 심각도 10%를 결합해 최종 위험도와 등급을 계산</div>
         </div>
         <div class="info-row delay-4" style="border-color:rgba(0,198,167,0.2);">
-          <div class="info-row-label" style="color:var(--accent)">배경</div>
-          <div class="info-row-val">1학년 자동차 데이터 분석의 연장선 — GPS 기반 현재 위치 사고 위험도 제공</div>
+          <div class="info-row-label" style="color:var(--accent)">산출물</div>
+          <div class="info-row-val">region_accident_preprocessor.py · fetch_kma_asos_hourly.py · final_risk_analyzer.py · final_risk_result.csv</div>
         </div>
       </div>
       <div class="progress-bar" style="width:50%"></div>
     </div>
 
-    <!-- SLIDE 8: Project 5 -->
+    <!-- SLIDE 8: Project 4 분석 결과 -->
+    <div class="slide s-dark" data-thumb="P4. 분석 결과">
+      <div class="slide-label">Project 04 Result</div>
+      <div class="slide-title">실제 CSV 결과로 확인한 위험 패턴</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;">
+        <div class="cat-card delay-1" style="text-align:left;border-color:rgba(0,198,167,0.25);">
+          <div class="cat-num c-cs">279</div>
+          <div class="cat-label">최종 결과 행 수</div>
+          <div style="margin-top:8px;font-size:clamp(9px,1.1vw,13px);color:rgba(255,255,255,0.45);line-height:1.5;">2025.09.16~17<br>18:00~익일 02:00</div>
+        </div>
+        <div class="cat-card delay-2" style="text-align:left;border-color:rgba(46,124,246,0.25);">
+          <div class="cat-num" style="color:#7db3ff;">47.85</div>
+          <div class="cat-label">전체 평균 위험도</div>
+          <div style="margin-top:8px;font-size:clamp(9px,1.1vw,13px);color:rgba(255,255,255,0.45);line-height:1.5;">0~100점 기준<br>평균 D 등급권</div>
+        </div>
+        <div class="cat-card delay-3" style="text-align:left;border-color:rgba(248,113,113,0.28);">
+          <div class="cat-num" style="color:#f87171;">85.00</div>
+          <div class="cat-label">최고 위험도</div>
+          <div style="margin-top:8px;font-size:clamp(9px,1.1vw,13px);color:rgba(255,255,255,0.45);line-height:1.5;">수원시 · 안개<br>00~02시 구간</div>
+        </div>
+        <div class="cat-card delay-4" style="text-align:left;border-color:rgba(240,180,41,0.25);">
+          <div class="cat-num c-math">4</div>
+          <div class="cat-label">B등급 위험 구간</div>
+          <div style="margin-top:8px;font-size:clamp(9px,1.1vw,13px);color:rgba(255,255,255,0.45);line-height:1.5;">고위험 조건을<br>등급으로 분류</div>
+        </div>
+      </div>
+      <div style="flex:1;display:grid;grid-template-columns:1.1fr .9fr;gap:14px;min-height:0;">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-content:start;">
+          <div class="info-row delay-2" style="border-color:rgba(248,113,113,0.24);">
+            <div class="info-row-label" style="color:#f87171;">안개</div>
+            <div class="info-row-val"><strong style="font-family:'Space Grotesk',sans-serif;font-size:28px;color:#f87171;">61.5</strong><br>133건 · 최고 85.00</div>
+          </div>
+          <div class="info-row delay-3" style="border-color:rgba(46,124,246,0.24);">
+            <div class="info-row-label" style="color:#7db3ff;">비</div>
+            <div class="info-row-val"><strong style="font-family:'Space Grotesk',sans-serif;font-size:28px;color:#7db3ff;">41.7</strong><br>30건 · 최고 64.35</div>
+          </div>
+          <div class="info-row delay-4">
+            <div class="info-row-label">없음</div>
+            <div class="info-row-val"><strong style="font-family:'Space Grotesk',sans-serif;font-size:28px;color:rgba(255,255,255,0.65);">33.8</strong><br>116건 · 최고 57.85</div>
+          </div>
+          <div class="info-row delay-5" style="grid-column:1 / -1;border-color:rgba(240,180,41,0.22);">
+            <div class="info-row-label" style="color:#f0b429;">핵심 해석</div>
+            <div class="info-row-val">단순 강수보다 강수 이후 시정거리 저하·안개가 위험도 상승 요인으로 더 뚜렷하게 나타났다.</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="info-row delay-2">
+            <div class="info-row-label">지역 Top 5</div>
+            <div class="info-row-val">수원 70.6/85.0 · 고양 66.7/75.91 · 평택 63.5/72.73 · 화성 63.2/77.6 · 용인 61.5/75.92</div>
+          </div>
+          <div class="info-row delay-3">
+            <div class="info-row-label">시간대 패턴</div>
+            <div class="info-row-val">18~20시 37.6점 → 21~23시 46.4점 → 00~02시 59.6점으로 야간 심화 구간에서 상승</div>
+          </div>
+          <div class="info-row delay-4" style="border-color:rgba(0,198,167,0.22);">
+            <div class="info-row-label" style="color:var(--accent);">모델 의미</div>
+            <div class="info-row-val">지역 기반 위험과 시간 기반 위험을 분리해 계산함으로써, 집계 통계의 한계를 소프트웨어 설계로 보완했다.</div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-bar" style="width:54%"></div>
+    </div>
+
+    <!-- SLIDE 9: Project 5 -->
     <div class="slide s-split" data-thumb="P5. 웹 대시보드">
       <div class="proj-left" style="background:linear-gradient(160deg,#0a2a3a,#0d3a4e);">
         <div class="proj-num">Project 05 — 컴공 핵심 ⭐</div>
         <div class="proj-title">위치 기반 교통 위험도<br>분석 결과 시각화 웹 대시보드</div>
         <div class="proj-subject" style="background:rgba(46,124,246,0.12);border-color:rgba(46,124,246,0.25);color:#7db3ff;">📚 응용프로그래밍 화면 구현</div>
         <div class="proj-desc">
-          Project 4의 분석 결과를 사용자가 직관적으로 이해할 수 있는 웹 대시보드로 구현. 지역·시간대·날씨 조건에 따른 위험도 점수와 사고 빈도를 그래프와 표로 시각화하고, 사용자 경험을 고려해 정보 구조를 설계한다.
+          Project 4의 분석 결과를 Flask 기반 웹 대시보드로 확장했다. 사용자가 경기도 시·군을 선택하면 실시간 기상 API와 지역 사고 기준값을 결합해 위험도 점수·등급·위험 요인을 카드와 Chart.js 그래프로 제공한다.
         </div>
         <div class="tag-row" style="margin-top:12px;">
           <span class="tag">가천대</span><span class="tag">건국대</span><span class="tag">단국대</span><span class="tag">서강대</span>
@@ -928,25 +991,74 @@
       <div class="proj-right">
         <div class="info-row delay-1">
           <div class="info-row-label">주요 기능</div>
-          <div class="info-row-val">지역·시간대·날씨 선택 → 위험도 점수 표시 → 사고 빈도 그래프 → 위험도 등급별 색상 표시</div>
+          <div class="info-row-val">지역 선택 · 실시간 기상 조회 · 위험도 카드 · 구성 요소별 점수 · 위험 요인 자동 해석 · 상세 결과 표</div>
         </div>
         <div class="info-row delay-2">
           <div class="info-row-label">강조 역량</div>
-          <div class="info-row-val">웹 UI 설계 · 데이터 시각화 · 사용자 경험 설계 · 프론트엔드 구현 · 정보 구조화</div>
+          <div class="info-row-val">Flask 라우팅 · Python/pandas 계산 · Chart.js 시각화 · 사용자 경험 설계 · API 오류 처리</div>
         </div>
         <div class="info-row delay-3">
           <div class="info-row-label">산출물</div>
-          <div class="info-row-val">웹 화면 · 와이어프레임 · 대시보드 캡처본 · 사용자 테스트 결과</div>
+          <div class="info-row-val">실시간 위험도 대시보드 · 지역 비교 그래프 · 위험도 구성 그래프 · 분석 결과 표 · 한계/개선안</div>
         </div>
         <div class="info-row delay-4">
           <div class="info-row-label">포지셔닝</div>
-          <div class="info-row-val">자율주행 미니카 대시보드가 아닌 <span style="color:#7db3ff">위치 기반 교통 위험도 정보 서비스</span>로 독립적 구성</div>
+          <div class="info-row-val">자율주행 미니카 대시보드가 아닌 <span style="color:#7db3ff">위치 기반 교통 위험도 정보 서비스</span>로 독립 구성</div>
         </div>
       </div>
       <div class="progress-bar" style="width:57.14%"></div>
     </div>
 
-    <!-- SLIDE 9: Project 6 -->
+    <!-- SLIDE 10: Project 5 구현 보강 -->
+    <div class="slide s-dark" data-thumb="P5. 대시보드 구현">
+      <div class="slide-label">Project 05 Implementation</div>
+      <div class="slide-title">분석 결과를 사용자가 읽을 수 있는 화면으로 전환</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1;min-height:0;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-content:start;">
+          <div class="cat-card delay-1" style="text-align:left;border-color:rgba(46,124,246,0.25);">
+            <div style="font-size:clamp(12px,1.4vw,16px);font-weight:700;color:#7db3ff;margin-bottom:8px;">지역 선택</div>
+            <div style="font-size:clamp(10px,1.1vw,13px);color:rgba(255,255,255,0.62);line-height:1.65;">경기도 시·군 선택<br>지역 기준값 자동 적용<br>위험도 비교</div>
+          </div>
+          <div class="cat-card delay-2" style="text-align:left;border-color:rgba(240,180,41,0.25);">
+            <div style="font-size:clamp(12px,1.4vw,16px);font-weight:700;color:#f0b429;margin-bottom:8px;">실시간 기상</div>
+            <div style="font-size:clamp(10px,1.1vw,13px);color:rgba(255,255,255,0.62);line-height:1.65;">초단기실황 API<br>강수·습도·풍속<br>현재 조건 반영</div>
+          </div>
+          <div class="cat-card delay-3" style="text-align:left;border-color:rgba(0,198,167,0.25);">
+            <div style="font-size:clamp(12px,1.4vw,16px);font-weight:700;color:var(--accent);margin-bottom:8px;">위험도 카드</div>
+            <div style="font-size:clamp(10px,1.1vw,13px);color:rgba(255,255,255,0.62);line-height:1.65;">최종 점수·등급<br>기상/시간/사고빈도<br>심각도 분해</div>
+          </div>
+          <div class="cat-card delay-4" style="text-align:left;border-color:rgba(167,139,250,0.25);">
+            <div style="font-size:clamp(12px,1.4vw,16px);font-weight:700;color:#a78bfa;margin-bottom:8px;">Chart.js</div>
+            <div style="font-size:clamp(10px,1.1vw,13px);color:rgba(255,255,255,0.62);line-height:1.65;">구성 비율 그래프<br>지역별 비교<br>시간대별 추이</div>
+          </div>
+          <div class="info-row delay-5" style="grid-column:1 / -1;border-color:rgba(46,124,246,0.22);">
+            <div class="info-row-label" style="color:#7db3ff;">대시보드 예시</div>
+            <div class="info-row-val">위험도 67.3점 · D등급 · 기상 72.0 · 시간대 70.0 · 사고빈도 60.5 · 심각도 55.0처럼 점수 근거를 분해 표시</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="info-row delay-2" style="border-color:rgba(248,113,113,0.22);">
+            <div class="info-row-label" style="color:#f87171;">API 인증 오류</div>
+            <div class="info-row-val">401/403 오류를 요청 URL 구조와 서비스 승인 상태 문제로 분석하고, serviceKey 전달 방식을 수정</div>
+          </div>
+          <div class="info-row delay-3" style="border-color:rgba(240,180,41,0.22);">
+            <div class="info-row-label" style="color:#f0b429;">호출 제한</div>
+            <div class="info-row-val">429 rate limit 문제를 서버 메모리 캐싱과 지역 비교 기본 수 축소로 완화</div>
+          </div>
+          <div class="info-row delay-4">
+            <div class="info-row-label">보안 처리</div>
+            <div class="info-row-val">오류 메시지에 API 키가 노출되지 않도록 URL 마스킹 함수를 추가하고 .env 기반 키 분리 관리</div>
+          </div>
+          <div class="info-row delay-5" style="border-color:rgba(0,198,167,0.22);">
+            <div class="info-row-label" style="color:var(--accent);">개선 방향</div>
+            <div class="info-row-val">교통량·인구수·도로 길이 보정 변수, 시정거리 API, 지도 기반 위험도 표시로 모델 정밀화 가능</div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-bar" style="width:60%"></div>
+    </div>
+
+    <!-- SLIDE 11: Project 6 -->
     <div class="slide s-split" data-thumb="P6. 개발자 책임">
       <div class="proj-left" style="background:linear-gradient(160deg,#2a0e1a,#3a1224);">
         <div class="proj-num">Project 06</div>
@@ -1284,8 +1396,8 @@
             <tr><td><span class="n-badge">1</span></td><td>카메라·초음파센서 융합 자율주행 미니카</td><td>커넥티드 카</td><td><span class="category-pill cp-hw">HW/시스템</span></td><td>한양·건국·가천</td></tr>
             <tr><td><span class="n-badge">2</span></td><td>자율주행 윤리 위험 최소화 영어 토론</td><td>실용영어</td><td><span class="category-pill cp-eth">윤리/영어</span></td><td>한양·서강·연세</td></tr>
             <tr><td><span class="n-badge">3</span></td><td>규칙 기반 vs AI 기반 판단 방식 비교</td><td>자동차AI구현</td><td><span class="category-pill cp-cs">AI/알고리즘</span></td><td>서강·한양·단국</td></tr>
-            <tr><td><span class="n-badge">4</span></td><td>교통사고·기상 데이터 위험도 분석 프로그램</td><td>응용프로그래밍 개발</td><td><span class="category-pill cp-cs">데이터/SW</span></td><td>서강·단국·가천</td></tr>
-            <tr><td><span class="n-badge">5</span></td><td>위치 기반 교통 위험도 웹 대시보드</td><td>응용프로그래밍 화면</td><td><span class="category-pill cp-cs">UI/UX</span></td><td>가천·건국·단국</td></tr>
+            <tr><td><span class="n-badge">4</span></td><td>경기도 악천후 교통사고 위험도 분석 프로그램</td><td>응용프로그래밍 개발</td><td><span class="category-pill cp-cs">데이터/SW</span></td><td>서강·단국·가천</td></tr>
+            <tr><td><span class="n-badge">5</span></td><td>Flask 기반 교통 위험도 시각화 웹 대시보드</td><td>응용프로그래밍 화면</td><td><span class="category-pill cp-cs">UI/UX</span></td><td>가천·건국·단국</td></tr>
             <tr><td><span class="n-badge">6</span></td><td>자율주행 SW 개발자의 테스트 책임과 협업</td><td>성공적인 직업생활</td><td><span class="category-pill cp-eth">직업윤리</span></td><td>전체 대학</td></tr>
             <tr><td><span class="n-badge">7</span></td><td>교통 위험도 점수화 모델 설계</td><td>수학 보완</td><td><span class="category-pill cp-math">수학/모델링</span></td><td>서강·단국·연세</td></tr>
             <tr><td><span class="n-badge">8</span></td><td>속도·제동거리 기반 안전거리 분석</td><td>자율주행 자동차</td><td><span class="category-pill cp-math">물리/차량</span></td><td>한양·건국·연세</td></tr>
@@ -1450,9 +1562,9 @@
     },
     {
       label: 'P5. 웹 대시보드',
-      progress: 20,
-      status: 'planned',
-      note: 'P4 완료 후 착수 예정, 와이어프레임 스케치 중'
+      progress: 100,
+      status: 'done',
+      note: 'Flask/Chart.js 대시보드 구현 완료'
     },
     {
       label: 'P6. 개발자 책임·협업 윤리',
