@@ -26,7 +26,7 @@
   --white:    #f0f4ff;
   --mono:     'JetBrains Mono', monospace;
   --sans:     'Noto Sans KR', sans-serif;
-  --content-max: 1120px;
+  --content-max: 1280px;
 }
 
 html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); font-family:var(--sans); color:var(--white); -webkit-font-smoothing:antialiased; }
@@ -37,7 +37,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
 .slide {
   position:absolute; inset:0;
   display:flex; flex-direction:column; justify-content:center;
-  padding:56px 80px;
+  padding:54px 72px;
   opacity:0; pointer-events:none;
   transform:translateX(50px);
   transition:opacity .45s cubic-bezier(.4,0,.2,1), transform .45s cubic-bezier(.4,0,.2,1);
@@ -82,8 +82,8 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
 
 /* ── CHROME ── */
 #progress { position:fixed; top:0; left:0; height:2px; background:var(--accent); transition:width .4s ease; z-index:200; }
-#counter  { position:fixed; bottom:26px; right:40px; font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:.06em; z-index:200; }
-#hint     { position:fixed; bottom:26px; left:80px; font-family:var(--mono); font-size:10px; color:rgba(255,255,255,.18); letter-spacing:.05em; z-index:200; }
+#counter  { position:fixed; bottom:26px; right:40px; font-family:var(--mono); font-size:12px; color:var(--muted); letter-spacing:.06em; z-index:200; }
+#hint     { position:fixed; bottom:26px; left:80px; font-family:var(--mono); font-size:11px; color:rgba(255,255,255,.18); letter-spacing:.05em; z-index:200; }
 
 #dots { position:fixed; bottom:26px; left:50%; transform:translateX(-50%); display:flex; gap:7px; z-index:200; }
 .dot { width:5px; height:5px; border-radius:50%; background:var(--line2); cursor:pointer; transition:background .3s, transform .3s; }
@@ -116,7 +116,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
 
 /* ── OVERLINE ── */
 .ov {
-  font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  font-family:var(--mono); font-size:12px; letter-spacing:.16em; text-transform:uppercase;
   color:var(--muted); margin-bottom:14px;
   display:flex; align-items:center; gap:10px;
 }
@@ -124,23 +124,23 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
 
 /* ── TITLES ── */
 .t-hero {
-  font-size:clamp(44px,5.8vw,76px); font-weight:900; line-height:1.04;
+  font-size:clamp(50px,6.2vw,86px); font-weight:900; line-height:1.04;
   letter-spacing:-.03em; margin-bottom:20px;
 }
 .t-hero em { font-style:normal; color:var(--accent); }
 
 .t-slide {
-  font-size:clamp(28px,3.6vw,48px); font-weight:800; line-height:1.12;
+  font-size:clamp(32px,4vw,56px); font-weight:800; line-height:1.12;
   letter-spacing:-.025em; margin-bottom:10px;
 }
 .t-slide em { font-style:normal; color:var(--accent); }
 
-.sub { font-size:15px; color:var(--sub); line-height:1.65; max-width:580px; margin-bottom:36px; }
+.sub { font-size:17px; color:var(--sub); line-height:1.7; max-width:760px; margin-bottom:38px; }
 .slide > .sub { max-width: var(--content-max); }
 
 /* ── CODE CHIP ── */
 .chip {
-  font-family:var(--mono); font-size:11px; letter-spacing:.04em;
+  font-family:var(--mono); font-size:12px; letter-spacing:.04em;
   padding:4px 10px; border-radius:4px;
   background:rgba(91,141,239,.12); border:1px solid rgba(91,141,239,.28);
   color:rgba(91,141,239,.9); display:inline-block;
@@ -153,11 +153,11 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
 .chip-row { display:flex; flex-wrap:wrap; gap:7px; margin-top:32px; }
 
 /* ── CARD GRID ── */
-.grid { display:grid; gap:14px; width:100%; }
+.grid { display:grid; gap:17px; width:100%; }
 .g2 { grid-template-columns:1fr 1fr; }
 .g3 { grid-template-columns:1fr 1fr 1fr; }
 .g4 { grid-template-columns:repeat(4,1fr); }
-.split { display:grid; grid-template-columns:1fr 1fr; gap:28px; align-items:start; }
+.split { display:grid; grid-template-columns:1fr 1fr; gap:34px; align-items:start; }
 .split-wide { grid-template-columns:3fr 2fr; }
 
 /* ── METRIC STRIP ── */
@@ -171,33 +171,33 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   background:rgba(255,255,255,.035);
   border:1px solid var(--line2);
   border-radius:10px;
-  padding:14px 16px;
+  padding:16px 18px;
   text-align:center;
   min-height:72px;
 }
 .metric-card strong {
   display:block;
   font-family:var(--mono);
-  font-size:clamp(20px,2.4vw,30px);
+  font-size:clamp(24px,2.8vw,36px);
   line-height:1;
   margin-bottom:7px;
 }
 .metric-card span {
   display:block;
-  font-size:11px;
+  font-size:12px;
   color:var(--muted);
   line-height:1.35;
 }
 
 .card {
   background:var(--bg3); border:1px solid var(--line2);
-  border-radius:12px; padding:22px;
+  border-radius:12px; padding:26px;
   transition:border-color .25s;
 }
 .card:hover { border-color:rgba(255,255,255,.2); }
-.card-ov { font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:7px; }
-.card-t  { font-size:15px; font-weight:600; line-height:1.4; margin-bottom:6px; }
-.card-b  { font-size:13px; color:var(--sub); line-height:1.65; }
+.card-ov { font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:7px; }
+.card-t  { font-size:17px; font-weight:600; line-height:1.4; margin-bottom:6px; }
+.card-b  { font-size:14.5px; color:var(--sub); line-height:1.68; }
 
 /* ── ACCENT CARD ── */
 .card-accent { border-color:rgba(91,141,239,.35); background:rgba(91,141,239,.06); }
@@ -209,7 +209,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
 .hl {
   border-left:3px solid var(--accent); padding:13px 17px;
   background:rgba(91,141,239,.07); border-radius:0 8px 8px 0;
-  font-size:13.5px; line-height:1.7; color:var(--sub); margin:14px 0;
+  font-size:14.5px; line-height:1.75; color:var(--sub); margin:14px 0;
 }
 .hl.green  { border-left-color:var(--green);  background:rgba(52,211,153,.06); }
 .hl.amber  { border-left-color:var(--amber); background:rgba(251,191,36,.06); }
@@ -219,7 +219,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
 /* ── ROLE BADGE ── */
 .role-badge {
   display:inline-flex; align-items:center; gap:6px;
-  font-size:12px; font-weight:500;
+  font-size:13px; font-weight:500;
   padding:4px 12px 4px 8px; border-radius:20px;
   border:1px solid var(--line2); background:var(--bg3);
 }
@@ -233,8 +233,8 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   display:flex; align-items:center; justify-content:center;
   font-family:var(--mono); font-size:10px; color:var(--muted); margin-top:2px;
 }
-.step h4 { font-size:14px; font-weight:500; margin-bottom:2px; }
-.step p  { font-size:12.5px; color:var(--muted); line-height:1.55; }
+.step h4 { font-size:15.5px; font-weight:500; margin-bottom:2px; }
+.step p  { font-size:13.5px; color:var(--muted); line-height:1.6; }
 
 /* ── PROBLEM/SOLUTION ── */
 .ps-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
@@ -244,33 +244,33 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
 .ps-label { font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px; }
 .ps-label.r { color:rgba(248,113,113,.7); }
 .ps-label.g { color:rgba(52,211,153,.7); }
-.ps-body { font-size:13px; line-height:1.6; color:var(--sub); }
+.ps-body { font-size:14px; line-height:1.65; color:var(--sub); }
 
 /* ── FLOW ── */
 .flow { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:18px 0; }
 .flow-box {
   background:var(--bg3); border:1px solid var(--line2); border-radius:8px;
-  padding:10px 14px; font-size:12px; text-align:center; line-height:1.5;
+  padding:11px 15px; font-size:13px; text-align:center; line-height:1.55;
 }
 .flow-box strong { display:block; font-family:var(--mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:2px; }
 .flow-sep { color:var(--muted); font-size:15px; }
 
 /* ── ARCH TABLE ── */
-.arch-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.04); font-size:13px; }
+.arch-row { display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid rgba(255,255,255,.04); font-size:14px; }
 .arch-row:last-child { border-bottom:none; }
 .arch-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
 .arch-name { font-weight:500; width:180px; flex-shrink:0; }
-.arch-desc { color:var(--muted); line-height:1.5; font-size:12.5px; }
+.arch-desc { color:var(--muted); line-height:1.55; font-size:13.5px; }
 
 /* ── SECURITY GRID ── */
 .sec-item {
   background:var(--bg3); border:1px solid var(--line2); border-radius:10px; padding:16px 18px;
 }
 .sec-item:hover { border-color:rgba(248,113,113,.3); }
-.sec-title { font-size:13.5px; font-weight:600; margin-bottom:5px; display:flex; align-items:center; gap:8px; }
+.sec-title { font-size:15px; font-weight:600; margin-bottom:5px; display:flex; align-items:center; gap:8px; }
 .sec-bullet { width:6px; height:6px; border-radius:50%; background:var(--red); flex-shrink:0; }
-.sec-body { font-size:12.5px; color:var(--muted); line-height:1.6; }
-.sec-fix { font-size:12px; color:rgba(52,211,153,.8); margin-top:7px; padding-top:7px; border-top:1px solid rgba(255,255,255,.05); }
+.sec-body { font-size:13.5px; color:var(--muted); line-height:1.65; }
+.sec-fix { font-size:13px; color:rgba(52,211,153,.8); margin-top:7px; padding-top:7px; border-top:1px solid rgba(255,255,255,.05); }
 
 /* ── TIMELINE (evolution) ── */
 .tl-row { display:flex; gap:0; align-items:stretch; margin:20px 0; }
@@ -286,8 +286,8 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   margin-bottom:10px; flex-shrink:0;
 }
 .tl-label { font-family:var(--mono); font-size:10px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-bottom:4px; }
-.tl-title { font-size:13px; font-weight:600; margin-bottom:4px; }
-.tl-body  { font-size:12px; color:var(--muted); line-height:1.55; }
+.tl-title { font-size:14.5px; font-weight:600; margin-bottom:4px; }
+.tl-body  { font-size:13px; color:var(--muted); line-height:1.6; }
 .tl-bad  .tl-dot { background:var(--red);   border-color:rgba(248,113,113,.3); }
 .tl-bad  .tl-item::before { background:rgba(248,113,113,.25); }
 .tl-mid  .tl-dot { background:var(--amber);  border-color:rgba(251,191,36,.3); }
@@ -310,6 +310,17 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
 
 /* ── VERTICAL DECO ── */
 .deco-v { position:absolute; width:1px; height:100%; top:0; background:var(--line); pointer-events:none; z-index:0; }
+
+/* ── PRESENTATION SCALE ── */
+.slide [style*="font-size:10px"] { font-size: 11.5px !important; }
+.slide [style*="font-size:11px"] { font-size: 12.5px !important; }
+.slide [style*="font-size:12px"] { font-size: 14px !important; }
+.slide [style*="font-size:12.5px"] { font-size: 14.5px !important; }
+.slide [style*="font-size:13px"] { font-size: 15px !important; }
+.slide [style*="font-size:13.5px"] { font-size: 15.5px !important; }
+.slide [style*="font-size:14px"] { font-size: 16px !important; }
+.slide [style*="font-size:15px"] { font-size: 17px !important; }
+.slide [style*="font-size:16px"] { font-size: 18px !important; }
 
 @media (max-width: 900px) {
   .slide { padding:40px 28px; }
@@ -338,7 +349,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   <div class="ov a d1">탐구 보고서 · 앱 개발 프로젝트</div>
   <h1 class="t-hero a d2"><em>Dojae</em></h1>
   <p style="font-size:clamp(18px,2.2vw,28px);font-weight:500;color:var(--sub);margin-bottom:12px;letter-spacing:-.01em;" class="a d3">현장실습 출결 자동화 앱</p>
-  <p style="font-size:15px;color:var(--muted);line-height:1.65;max-width:1120px;" class="a d4">Flutter · Firebase · OCR · Cloud Functions<br>학생·교사·관리자 통합 모바일 서비스</p>
+  <p style="font-size:15px;color:var(--muted);line-height:1.65;max-width:1280px;" class="a d4">Flutter · Firebase · OCR · Cloud Functions<br>학생·교사·관리자 통합 모바일 서비스</p>
 
   <div class="chip-row a d5">
     <span class="chip">Flutter / Dart</span>
@@ -360,7 +371,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   <div class="ov a d1">탐구 동기</div>
   <h2 class="t-slide a d2">왜 만들었나</h2>
 
-  <div style="max-width:1120px;margin-top:6px;">
+  <div style="max-width:1280px;margin-top:6px;">
     <!-- evolution timeline -->
     <div class="a d3" style="display:flex;gap:0;align-items:stretch;margin:18px 0 24px;">
       <div style="flex:1;padding-right:20px;border-right:1px solid var(--line2);">
@@ -415,7 +426,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   <div class="ov a d1">앱 개요</div>
   <h2 class="t-slide a d2">Dojae가 하는 일</h2>
 
-  <div class="grid g3 a d3" style="max-width:1120px;margin-top:20px;">
+  <div class="grid g3 a d3" style="max-width:1280px;margin-top:20px;">
     <div class="card" style="border-color:rgba(91,141,239,.3);padding:24px;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
         <div class="role-dot" style="background:var(--accent);"></div>
@@ -457,7 +468,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
     </div>
   </div>
 
-  <div class="metric-strip a d4" style="max-width:1120px;margin-top:14px;">
+  <div class="metric-strip a d4" style="max-width:1280px;margin-top:14px;">
     <div class="metric-card">
       <strong style="color:var(--accent);">5</strong>
       <span>채팅 유형</span>
@@ -482,7 +493,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   <div class="ov a d1">사용 기술</div>
   <h2 class="t-slide a d2">기술 스택</h2>
 
-  <div class="split a d3" style="max-width:1120px;margin-top:16px;gap:20px;">
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;gap:20px;">
     <div>
       <div class="arch-row">
         <div class="arch-icon" style="background:rgba(91,141,239,.15);">📱</div>
@@ -535,7 +546,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   <div class="ov a d1">핵심 구현 · OCR</div>
   <h2 class="t-slide a d2">출결 인식 파이프라인</h2>
 
-  <div class="split a d3" style="max-width:1120px;margin-top:16px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
     <div>
       <div class="flow" style="flex-direction:column;align-items:stretch;gap:8px;">
         <div style="display:flex;align-items:center;gap:10px;">
@@ -585,7 +596,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   <div class="ov a d1">핵심 구현 · 저장 구조</div>
   <h2 class="t-slide a d2">Firestore 트랜잭션 설계</h2>
 
-  <div class="split a d3" style="max-width:1120px;margin-top:16px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
     <div>
       <div class="card" style="padding:22px;margin-bottom:12px;">
         <div class="card-ov">Deterministic Document ID</div>
@@ -633,7 +644,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   <div class="ov a d1">보안 설계</div>
   <h2 class="t-slide a d2">Firestore Security Rules</h2>
 
-  <div class="split a d3" style="max-width:1120px;margin-top:16px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
     <div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:10px;font-family:var(--mono);">역할별 접근 제어</div>
       <div class="card" style="padding:16px;margin-bottom:10px;border-color:rgba(91,141,239,.3);">
@@ -689,7 +700,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   <div class="ov a d1">채팅 시스템</div>
   <h2 class="t-slide a d2">채팅 기능 구조</h2>
 
-  <div class="split a d3" style="max-width:1120px;margin-top:16px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
     <div>
       <div class="grid g2" style="gap:10px;margin-bottom:12px;">
         <div class="card" style="padding:14px;">
@@ -732,7 +743,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   <div class="ov a d1">문제 해결 · 핵심 사례</div>
   <h2 class="t-slide a d2">iOS <em>무한 로딩</em> 문제</h2>
 
-  <div class="split a d3" style="max-width:1120px;margin-top:18px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:18px;align-items:start;">
     <div>
       <div class="ps-row">
         <div class="ps-box ps-symptom">
@@ -788,7 +799,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   <h2 class="t-slide a d2">스스로 발견한 <em>보안 취약점</em></h2>
   <p class="sub a d2" style="margin-bottom:16px;">정상 사용자 흐름은 유지하면서 악용 가능성은 차단</p>
 
-  <div class="grid g3 a d3" style="max-width:1120px;">
+  <div class="grid g3 a d3" style="max-width:1280px;">
     <div class="sec-item">
       <div class="sec-title"><div class="sec-bullet"></div>채팅 미리보기 위조</div>
       <div class="sec-body">lastMessage·lastMessageTime을 클라이언트가 직접 갱신하면 채팅방 미리보기 조작 가능</div>
@@ -827,7 +838,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   <div class="ov a d1">문제 해결 · 데이터 정합성</div>
   <h2 class="t-slide a d2">기타 해결 문제들</h2>
 
-  <div class="grid g2 a d3" style="max-width:1120px;margin-top:18px;">
+  <div class="grid g2 a d3" style="max-width:1280px;margin-top:18px;">
     <div>
       <div class="ps-row" style="margin-bottom:12px;">
         <div class="ps-box ps-symptom">
@@ -878,7 +889,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   <div class="ov a d1">결론</div>
   <h2 class="t-slide a d2">탐구 요약</h2>
 
-  <div class="grid g3 a d3" style="max-width:1120px;margin-top:18px;">
+  <div class="grid g3 a d3" style="max-width:1280px;margin-top:18px;">
     <div class="card card-accent" style="padding:20px;">
       <div class="card-ov" style="color:rgba(91,141,239,.7);">기획 · 설계</div>
       <div class="card-t">실제 문제에서 출발</div>
@@ -896,7 +907,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
     </div>
   </div>
 
-  <div class="hl a d4" style="max-width:1120px;margin-top:16px;font-size:14px;">
+  <div class="hl a d4" style="max-width:1280px;margin-top:16px;font-size:14px;">
     소프트웨어가 <strong>실제 공동체의 업무 방식과 비용 구조를 바꿀 수 있음</strong>을 직접 경험하였다. 이 경험이 소프트웨어·컴퓨터공학 분야 진로를 더욱 확고히 하는 계기가 되었다.
   </div>
 </section>
@@ -906,7 +917,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   <div class="ov a d1">향후 계획</div>
   <h2 class="t-slide a d2">앞으로 개선할 것들</h2>
 
-  <div class="split a d3" style="max-width:1120px;margin-top:20px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:20px;align-items:start;">
     <div>
       <div class="step">
         <div class="step-n">1</div>
@@ -951,7 +962,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:var(--bg0); fo
   <div style="text-align:center;position:relative;z-index:1;" class="a d1">
     <div class="end-logo">DJ</div>
     <div class="ov" style="justify-content:center;margin-bottom:14px;">현장실습 출결 자동화 앱</div>
-    <h1 class="t-hero" style="font-size:clamp(36px,5vw,60px);margin-bottom:14px;">감사합니다</h1>
+    <h1 class="t-hero" style="font-size:clamp(46px,5.8vw,74px);margin-bottom:14px;">감사합니다</h1>
     <p style="font-size:15px;color:var(--muted);">탐구 보고서 · Dojae 앱 개발 프로젝트</p>
     <div class="chip-row" style="justify-content:center;margin-top:28px;">
       <span class="chip">Flutter</span>

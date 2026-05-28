@@ -28,7 +28,7 @@
   --white:   #eef4ff;
   --mono:    'JetBrains Mono', monospace;
   --sans:    'Noto Sans KR', sans-serif;
-  --content-max: 1120px;
+  --content-max: 1280px;
 }
 
 html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-family:var(--sans);color:var(--white);-webkit-font-smoothing:antialiased; }
@@ -39,7 +39,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
 .slide {
   position:absolute;inset:0;
   display:flex;flex-direction:column;justify-content:center;
-  padding:52px 80px;
+  padding:54px 72px;
   opacity:0;pointer-events:none;
   transform:translateX(50px);
   transition:opacity .42s cubic-bezier(.4,0,.2,1),transform .42s cubic-bezier(.4,0,.2,1);
@@ -72,8 +72,8 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
 
 /* ── CHROME ── */
 #progress { position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width .4s ease;z-index:200; }
-#counter  { position:fixed;bottom:26px;right:40px;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.06em;z-index:200; }
-#hint     { position:fixed;bottom:26px;left:80px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.16);letter-spacing:.05em;z-index:200; }
+#counter  { position:fixed;bottom:26px;right:40px;font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.06em;z-index:200; }
+#hint     { position:fixed;bottom:26px;left:80px;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.16);letter-spacing:.05em;z-index:200; }
 #dots     { position:fixed;bottom:26px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:200; }
 .dot { width:5px;height:5px;border-radius:50%;background:var(--line2);cursor:pointer;transition:background .3s,transform .3s; }
 .dot.on { background:var(--blue);transform:scale(1.5); }
@@ -99,7 +99,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
 
 /* ── OVERLINE ── */
 .ov {
-  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--muted);margin-bottom:13px;
   display:flex;align-items:center;gap:10px;
 }
@@ -107,23 +107,23 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
 
 /* ── TITLES ── */
 .th {
-  font-size:clamp(42px,5.6vw,72px);font-weight:900;line-height:1.04;
+  font-size:clamp(48px,6.1vw,84px);font-weight:900;line-height:1.04;
   letter-spacing:-.03em;margin-bottom:18px;
 }
 .th em { font-style:normal;color:var(--cyan); }
 
 .ts {
-  font-size:clamp(26px,3.4vw,46px);font-weight:800;line-height:1.12;
+  font-size:clamp(32px,4vw,56px);font-weight:800;line-height:1.12;
   letter-spacing:-.025em;margin-bottom:10px;
 }
 .ts em { font-style:normal;color:var(--cyan); }
 
-.sub { font-size:15px;color:var(--sub);line-height:1.65;max-width:580px;margin-bottom:32px; }
+.sub { font-size:17px;color:var(--sub);line-height:1.7;max-width:760px;margin-bottom:34px; }
 .slide > .sub { max-width:var(--content-max); }
 
 /* ── CHIPS ── */
 .chip {
-  font-family:var(--mono);font-size:11px;letter-spacing:.04em;
+  font-family:var(--mono);font-size:12px;letter-spacing:.04em;
   padding:4px 10px;border-radius:4px;display:inline-block;
   background:rgba(79,142,247,.12);border:1px solid rgba(79,142,247,.28);color:rgba(79,142,247,.9);
 }
@@ -135,21 +135,21 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
 .chip-row { display:flex;flex-wrap:wrap;gap:7px;margin-top:30px; }
 
 /* ── CARDS ── */
-.grid  { display:grid;gap:13px;width:100%; }
+.grid  { display:grid;gap:16px;width:100%; }
 .g2    { grid-template-columns:1fr 1fr; }
 .g3    { grid-template-columns:1fr 1fr 1fr; }
 .g4    { grid-template-columns:repeat(4,1fr); }
-.split { display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start; }
+.split { display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:start; }
 .sw    { grid-template-columns:3fr 2fr; }
 
 .card {
-  background:var(--bg3);border:1px solid var(--line2);border-radius:12px;padding:20px;
+  background:var(--bg3);border:1px solid var(--line2);border-radius:12px;padding:24px;
   transition:border-color .25s;
 }
 .card:hover { border-color:rgba(255,255,255,.2); }
-.ov2 { font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px; }
-.ct  { font-size:15px;font-weight:600;line-height:1.35;margin-bottom:5px; }
-.cb  { font-size:13px;color:var(--sub);line-height:1.65; }
+.ov2 { font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px; }
+.ct  { font-size:17px;font-weight:600;line-height:1.35;margin-bottom:6px; }
+.cb  { font-size:14.5px;color:var(--sub);line-height:1.68; }
 
 .card-b  { border-color:rgba(79,142,247,.3);  background:rgba(79,142,247,.06); }
 .card-c  { border-color:rgba(34,211,238,.3);  background:rgba(34,211,238,.05); }
@@ -161,7 +161,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
 .hl {
   border-left:3px solid var(--blue);padding:12px 16px;
   background:rgba(79,142,247,.07);border-radius:0 8px 8px 0;
-  font-size:13.5px;line-height:1.7;color:var(--sub);margin:12px 0;
+  font-size:14.5px;line-height:1.75;color:var(--sub);margin:12px 0;
 }
 .hl.g { border-left-color:var(--green);background:rgba(52,211,153,.06); }
 .hl.a { border-left-color:var(--amber);background:rgba(251,191,36,.06); }
@@ -175,8 +175,8 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
   display:flex;align-items:center;justify-content:center;
   font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px;
 }
-.step h4 { font-size:14px;font-weight:500;margin-bottom:2px; }
-.step p  { font-size:12.5px;color:var(--muted);line-height:1.55; }
+.step h4 { font-size:15.5px;font-weight:500;margin-bottom:2px; }
+.step p  { font-size:13.5px;color:var(--muted);line-height:1.6; }
 
 /* ── FLOW ── */
 .flow { display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:16px 0; }
@@ -195,7 +195,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
 .ps-lbl { font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px; }
 .ps-lbl.r { color:rgba(248,113,113,.7); }
 .ps-lbl.g { color:rgba(52,211,153,.7); }
-.ps-body { font-size:13px;line-height:1.6;color:var(--sub); }
+.ps-body { font-size:14px;line-height:1.65;color:var(--sub); }
 
 /* ── FORMULA ── */
 .formula {
@@ -217,18 +217,18 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
 .gc .gr { font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono); }
 
 /* ── ARCH TABLE ── */
-.ar { display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px; }
+.ar { display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:14px; }
 .ar:last-child { border-bottom:none; }
 .ai { width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0; }
 .an { font-weight:500;width:170px;flex-shrink:0; }
-.ad { color:var(--muted);line-height:1.5;font-size:12.5px; }
+.ad { color:var(--muted);line-height:1.55;font-size:13.5px; }
 
 /* ── MINI BAR ── */
 .mb { height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:7px; }
 .mbf { height:100%;border-radius:3px;transition:width .9s ease .3s; }
 
 /* ── LIMIT ── */
-.li { display:flex;gap:11px;margin-bottom:11px;font-size:13px;color:var(--sub);line-height:1.6;align-items:flex-start; }
+.li { display:flex;gap:11px;margin-bottom:11px;font-size:14px;color:var(--sub);line-height:1.65;align-items:flex-start; }
 .lb {
   font-family:var(--mono);font-size:10px;background:rgba(255,255,255,.05);
   border:1px solid var(--line2);border-radius:4px;padding:2px 6px;color:var(--muted);flex-shrink:0;margin-top:2px;
@@ -253,6 +253,17 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
   font-family:var(--mono);font-size:13px;font-weight:500;color:var(--blue);
   margin:0 auto 26px;letter-spacing:.02em;text-align:center;line-height:1.4;
 }
+
+/* ── PRESENTATION SCALE ── */
+.slide [style*="font-size:10px"] { font-size: 11.5px !important; }
+.slide [style*="font-size:11px"] { font-size: 12.5px !important; }
+.slide [style*="font-size:12px"] { font-size: 14px !important; }
+.slide [style*="font-size:12.5px"] { font-size: 14.5px !important; }
+.slide [style*="font-size:13px"] { font-size: 15px !important; }
+.slide [style*="font-size:13.5px"] { font-size: 15.5px !important; }
+.slide [style*="font-size:14px"] { font-size: 16px !important; }
+.slide [style*="font-size:15px"] { font-size: 17px !important; }
+.slide [style*="font-size:16px"] { font-size: 18px !important; }
 
 @media (max-width: 900px) {
   .slide { padding:40px 28px; }
@@ -280,7 +291,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
 
   <div class="ov a d1">탐구 보고서 · 데이터 분석 프로젝트</div>
   <h1 class="th a d2">경기도 <em>교통사고</em><br>위험도 분석<br>대시보드</h1>
-  <p style="font-size:15px;color:var(--muted);line-height:1.65;max-width:1120px;" class="a d3">
+  <p style="font-size:15px;color:var(--muted);line-height:1.65;max-width:1280px;" class="a d3">
     공공데이터 CSV · 기상청 API · 위험도 알고리즘<br>
     Flask 기반 실시간 웹 대시보드 개발
   </p>
@@ -302,7 +313,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
   <div class="ov a d1">프로젝트 동기</div>
   <h2 class="ts a d2">왜 만들었나</h2>
 
-  <div class="split a d3" style="max-width:1120px;margin-top:16px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
     <div>
       <div class="card card-b" style="margin-bottom:12px;padding:20px;">
         <div class="ov2" style="color:rgba(79,142,247,.7);">문제의식</div>
@@ -347,7 +358,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
   <div class="ov a d1">시스템 구조</div>
   <h2 class="ts a d2">전체 파이프라인</h2>
 
-  <div class="a d3" style="max-width:1120px;margin-top:18px;">
+  <div class="a d3" style="max-width:1280px;margin-top:18px;">
     <div class="flow" style="justify-content:center;">
       <div class="fb" style="border-color:rgba(248,113,113,.3);">
         <strong>DATA A</strong>
@@ -381,7 +392,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
     </div>
   </div>
 
-  <div class="split a d4" style="max-width:1120px;align-items:start;margin-top:10px;">
+  <div class="split a d4" style="max-width:1280px;align-items:start;margin-top:10px;">
     <div>
       <div style="font-size:13px;color:var(--muted);font-family:var(--mono);margin-bottom:10px;">기술 스택</div>
       <div class="ar"><div class="ai" style="background:rgba(79,142,247,.15);">🐍</div><div class="an"><span class="chip" style="font-size:10px;">Python · pandas</span></div><div class="ad">데이터 전처리 및 위험도 계산</div></div>
@@ -415,7 +426,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
   <div class="ov a d1">데이터 구성</div>
   <h2 class="ts a d2">두 가지 데이터 소스</h2>
 
-  <div class="split a d3" style="max-width:1120px;margin-top:18px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:18px;align-items:start;">
     <div class="card" style="padding:26px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
         <div class="ov2" style="color:rgba(248,113,113,.7);">KOROAD CSV</div>
@@ -452,7 +463,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
     </div>
   </div>
 
-  <div class="hl a a d4" style="max-width:1120px;margin-top:10px;font-size:13px;">
+  <div class="hl a a d4" style="max-width:1280px;margin-top:10px;font-size:13px;">
     <strong>설계 결정</strong>: 집계 통계의 한계(사고 발생 시각 없음)를 인정하고, 사고 CSV는 "지역 기반 위험도"로, API는 "시간 기반 위험도"로 역할을 분리하여 보완.
   </div>
 </section>
@@ -471,7 +482,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
     <span class="fg2">심각도 × 0.10</span>
   </div>
 
-  <div class="grid g4 a d4" style="max-width:1120px;">
+  <div class="grid g4 a d4" style="max-width:1280px;">
     <div class="card card-b" style="padding:16px;">
       <div class="ov2" style="color:rgba(79,142,247,.7);">기상 · 40%</div>
       <div class="cb" style="font-size:12.5px;">강수량 · 풍속 · 기온 · 강수형태<br>폭우·결빙 조건 가중 부여</div>
@@ -497,7 +508,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
     </div>
   </div>
 
-  <div class="a d5" style="max-width:1120px;margin-top:14px;">
+  <div class="a d5" style="max-width:1280px;margin-top:14px;">
     <div style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:7px;">위험 등급</div>
     <div class="grade-row">
       <div class="gc" style="background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.3);">
@@ -527,7 +538,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
   <div class="ov a d1">대시보드 기능</div>
   <h2 class="ts a d2">웹 대시보드 구현</h2>
 
-  <div class="split a d3" style="max-width:1120px;margin-top:16px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
     <div>
       <div class="grid g2" style="gap:10px;margin-bottom:12px;">
         <div class="card" style="padding:15px;">
@@ -589,7 +600,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
   <h2 class="ts a d2">2025년 9월 16~17일<br>수도권 <em>호우</em> 검증</h2>
   <p style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:16px;" class="a d2">18:00 ~ 익일 02:00 · 총 279행</p>
 
-  <div class="split a d3" style="max-width:1120px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;align-items:start;">
     <div>
       <div class="grid g3" style="margin-bottom:14px;">
         <div class="card" style="text-align:center;padding:16px;border-color:rgba(248,113,113,.3);">
@@ -635,7 +646,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
   <h2 class="ts a d2">경기도 시·군 위험도 기준값</h2>
   <p class="sub a d2" style="margin-bottom:16px;">KOROAD CSV → 0~100 정규화 결과 (상위 지역)</p>
 
-  <div class="split a d3" style="max-width:1120px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;align-items:start;">
     <div class="card" style="padding:0;overflow:hidden;">
       <table style="width:100%;border-collapse:collapse;font-size:13px;">
         <thead>
@@ -677,7 +688,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
   <div class="ov a d1">구현 문제 해결</div>
   <h2 class="ts a d2">API 연동 중 발생한<br>세 가지 문제</h2>
 
-  <div class="grid g3 a d3" style="max-width:1120px;margin-top:20px;">
+  <div class="grid g3 a d3" style="max-width:1280px;margin-top:20px;">
     <div>
       <div class="ps" style="margin-bottom:10px;">
         <div class="ps-box ps-r">
@@ -735,7 +746,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
   <div class="ov a d1">시각화 · Chart.js</div>
   <h2 class="ts a d2">위험도 구성 시각화</h2>
 
-  <div class="split a d3" style="max-width:1120px;margin-top:16px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
     <div class="card" style="padding:18px;">
       <div style="font-size:13px;font-weight:500;margin-bottom:4px;">시간대별 위험도 점수</div>
       <div class="cbr"><span><span class="dot2" style="background:var(--red);"></span>위험도 점수</span></div>
@@ -762,7 +773,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
   <div class="ov a d1">한계 및 개선 방향</div>
   <h2 class="ts a d2">솔직한 한계 분석</h2>
 
-  <div class="split a d3" style="max-width:1120px;margin-top:18px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:18px;align-items:start;">
     <div>
       <div style="font-size:13px;color:var(--muted);font-family:var(--mono);margin-bottom:10px;">현재 한계</div>
       <div class="li"><span class="lb">①</span><span>교통사고 CSV는 집계 통계라 <strong>개별 사고 시각과 기상 데이터를 직접 매칭 불가</strong></span></div>
@@ -801,7 +812,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
   <div class="ov a d1">결론</div>
   <h2 class="ts a d2">탐구 요약</h2>
 
-  <div class="grid g3 a d3" style="max-width:1120px;margin-top:18px;">
+  <div class="grid g3 a d3" style="max-width:1280px;margin-top:18px;">
     <div class="card card-b" style="padding:20px;">
       <div class="ov2" style="color:rgba(79,142,247,.7);">데이터 수집 · 전처리</div>
       <div class="ct">공공데이터 통합</div>
@@ -819,11 +830,11 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
     </div>
   </div>
 
-  <div class="hl c a d4" style="max-width:1120px;margin-top:14px;font-size:14px;">
+  <div class="hl c a d4" style="max-width:1280px;margin-top:14px;font-size:14px;">
     <strong>자율주행 연결</strong>: 도로 위험 정보를 수집·계산·전달하는 소프트웨어 구조는 자율주행 안전 판단 알고리즘과 직접 연결되는 구조다. 이 프로젝트가 그 기초 설계를 경험하는 과정이었다.
   </div>
 
-  <div class="grid g4 a d5" style="max-width:1120px;margin-top:12px;">
+  <div class="grid g4 a d5" style="max-width:1280px;margin-top:12px;">
     <div class="card" style="padding:14px;text-align:center;">
       <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--blue);">4</div>
       <div style="font-size:11px;color:var(--muted);margin-top:2px;">가중치 요소</div>
@@ -851,7 +862,7 @@ html,body { width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fa
   <div style="text-align:center;position:relative;z-index:1;" class="a d1">
     <div class="end-hex">위험도<br>대시보드</div>
     <div class="ov" style="justify-content:center;margin-bottom:14px;">경기도 기상 기반 교통사고 위험도 분석</div>
-    <h1 class="th" style="font-size:clamp(34px,5vw,58px);margin-bottom:14px;">감사합니다</h1>
+    <h1 class="th" style="font-size:clamp(44px,5.8vw,72px);margin-bottom:14px;">감사합니다</h1>
     <p style="font-size:15px;color:var(--muted);">탐구 보고서 · 데이터 분석 + Flask 웹 대시보드</p>
     <div class="chip-row" style="justify-content:center;margin-top:28px;">
       <span class="chip">Python · pandas</span>

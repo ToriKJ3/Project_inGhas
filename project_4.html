@@ -24,7 +24,7 @@
   --white:  #ffffff;
   --mono: 'DM Mono', monospace;
   --sans: 'Noto Sans KR', sans-serif;
-  --content-max: 1120px;
+  --content-max: 1280px;
 }
 
 html, body {
@@ -50,7 +50,7 @@ html, body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 64px 80px;
+  padding: 58px 72px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.5s ease, transform 0.5s ease;
@@ -105,7 +105,7 @@ html, body {
 /* ── TYPOGRAPHY ── */
 .overline {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--muted);
@@ -123,7 +123,7 @@ html, body {
 }
 
 h1.hero-title {
-  font-size: clamp(42px, 5.5vw, 72px);
+  font-size: clamp(48px, 6.1vw, 84px);
   font-weight: 900;
   line-height: 1.05;
   letter-spacing: -0.02em;
@@ -135,7 +135,7 @@ h1.hero-title em {
 }
 
 h2.slide-title {
-  font-size: clamp(28px, 3.5vw, 46px);
+  font-size: clamp(32px, 4vw, 56px);
   font-weight: 800;
   line-height: 1.15;
   letter-spacing: -0.02em;
@@ -144,10 +144,10 @@ h2.slide-title {
 h2.slide-title em { font-style: normal; color: var(--red); }
 
 .subtitle {
-  font-size: 15px;
+  font-size: 17px;
   color: var(--muted);
   line-height: 1.6;
-  max-width: 600px;
+  max-width: 760px;
   margin-bottom: 40px;
 }
 
@@ -160,7 +160,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
 }
 .tag {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.06em;
   padding: 5px 12px;
   border: 1px solid var(--line);
@@ -237,7 +237,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
 /* ── CARDS ── */
 .card-grid {
   display: grid;
-  gap: 16px;
+  gap: 20px;
   width: 100%;
 }
 .g2 { grid-template-columns: 1fr 1fr; }
@@ -249,30 +249,30 @@ h2.slide-title em { font-style: normal; color: var(--red); }
   background: var(--dark3);
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 24px;
+  padding: 28px;
   transition: border-color 0.3s;
 }
 .card:hover { border-color: rgba(255,255,255,0.18); }
 .card-label {
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 8px;
 }
-.card-title { font-size: 15px; font-weight: 600; line-height: 1.4; }
-.card-body  { font-size: 13px; color: var(--body); line-height: 1.6; margin-top: 8px; }
+.card-title { font-size: 17px; font-weight: 600; line-height: 1.4; }
+.card-body  { font-size: 14.5px; color: var(--body); line-height: 1.65; margin-top: 8px; }
 
 /* ── BIG STAT ── */
 .stat-num {
   font-family: var(--mono);
-  font-size: clamp(36px, 4vw, 56px);
+  font-size: clamp(42px, 4.8vw, 68px);
   font-weight: 700;
   line-height: 1;
   margin-bottom: 4px;
 }
-.stat-label { font-size: 12px; color: var(--muted); }
+.stat-label { font-size: 13.5px; color: var(--muted); }
 
 /* ── FORMULA ── */
 .formula {
@@ -281,7 +281,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
   border-radius: 10px;
   padding: 20px 28px;
   font-family: var(--mono);
-  font-size: clamp(13px, 1.4vw, 16px);
+  font-size: clamp(15px, 1.55vw, 18px);
   line-height: 2;
   margin: 20px 0;
 }
@@ -319,7 +319,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 10px 16px;
-  font-size: 12px;
+  font-size: 13.5px;
   text-align: center;
   line-height: 1.5;
 }
@@ -338,7 +338,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 14.5px;
 }
 .data-table th {
   font-family: var(--mono);
@@ -378,7 +378,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
   padding: 14px 18px;
   background: rgba(232,69,60,0.07);
   border-radius: 0 8px 8px 0;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.7;
   margin: 16px 0;
   color: var(--body);
@@ -416,8 +416,8 @@ h2.slide-title em { font-style: normal; color: var(--red); }
   flex-shrink: 0;
   margin-top: 2px;
 }
-.step-content h4 { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
-.step-content p  { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.step-content h4 { font-size: 15.5px; font-weight: 500; margin-bottom: 2px; }
+.step-content p  { font-size: 13.5px; color: var(--muted); line-height: 1.55; }
 
 /* ── BIG ACCENT LINE ── */
 .accent-bar {
@@ -434,7 +434,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
 .split {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 28px;
+  gap: 34px;
   align-items: start;
   width: 100%;
 }
@@ -482,7 +482,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
   letter-spacing: 0.1em;
   margin-bottom: 8px;
 }
-.concl-item p { font-size: 13px; color: var(--body); line-height: 1.65; }
+.concl-item p { font-size: 14.5px; color: var(--body); line-height: 1.7; }
 
 /* ── LIMIT ITEMS ── */
 .limit-row {
@@ -632,6 +632,17 @@ h2.slide-title em { font-style: normal; color: var(--red); }
   z-index: 100;
 }
 
+/* ── PRESENTATION SCALE ── */
+.slide [style*="font-size:10px"] { font-size: 11.5px !important; }
+.slide [style*="font-size:11px"] { font-size: 12.5px !important; }
+.slide [style*="font-size:12px"] { font-size: 14px !important; }
+.slide [style*="font-size:12.5px"] { font-size: 14.5px !important; }
+.slide [style*="font-size:13px"] { font-size: 15px !important; }
+.slide [style*="font-size:13.5px"] { font-size: 15.5px !important; }
+.slide [style*="font-size:14px"] { font-size: 16px !important; }
+.slide [style*="font-size:15px"] { font-size: 17px !important; }
+.slide [style*="font-size:16px"] { font-size: 18px !important; }
+
 @media (max-width: 900px) {
   .slide { padding: 40px 28px; }
   .split, .g2, .g3, .g4, .g6, .metric-ribbon { grid-template-columns: 1fr; }
@@ -676,7 +687,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
   <div class="overline anim anim-1">프로젝트 포지셔닝</div>
   <h2 class="slide-title anim anim-2">왜 이 프로젝트를<br>만들었나</h2>
 
-  <div class="card-grid g2 anim anim-3" style="margin-top:32px;max-width:1120px;">
+  <div class="card-grid g2 anim anim-3" style="margin-top:32px;max-width:1280px;">
     <div>
       <div class="card" style="margin-bottom:16px;">
         <div class="card-label">문제의식</div>
@@ -710,7 +721,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
   <h2 class="slide-title anim anim-2">디자인씽킹 <em>6단계</em> 적용</h2>
   <p class="subtitle anim anim-2" style="margin-bottom:24px;">토론·아이디어가 아니라 실제 데이터 분석 프로그램으로 구현</p>
 
-  <div class="card-grid g3 anim anim-3" style="max-width:1120px;">
+  <div class="card-grid g3 anim anim-3" style="max-width:1280px;">
     <div class="card">
       <div class="card-label">01 Empathize</div>
       <div class="card-title">악천후·야간 주행의<br>불안감 발견</div>
@@ -737,7 +748,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
     </div>
   </div>
 
-  <div class="hl-box anim anim-4" style="max-width:1120px;margin-top:20px;">
+  <div class="hl-box anim anim-4" style="max-width:1280px;margin-top:20px;">
     <strong>핵심 전환</strong> — "날씨가 나쁘면 위험하다"는 직관을 데이터 수집·전처리·알고리즘·그래프로 <strong>검증 가능한 형태</strong>로 바꾼다.
   </div>
 </section>
@@ -750,7 +761,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
   <h2 class="slide-title anim anim-2">두 가지 데이터 소스</h2>
   <p class="subtitle anim anim-2">사고 데이터는 지역 기준값, 기상 데이터는 시간별 위험도 계산에 사용</p>
 
-  <div class="split anim anim-3" style="max-width:1120px;">
+  <div class="split anim anim-3" style="max-width:1280px;">
     <div class="card" style="padding:28px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
         <div class="card-label" style="color:#60a5fa;">KOROAD CSV</div>
@@ -779,7 +790,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
     </div>
   </div>
 
-  <div class="hl-box amber anim anim-4" style="max-width:1120px;font-size:13px;">
+  <div class="hl-box amber anim anim-4" style="max-width:1280px;font-size:13px;">
     <strong>집계 통계의 한계</strong>: 사고 CSV는 개별 사고 시각이 없어 "지역별 기본 위험도"로 활용, 시간별 변화는 ASOS API로 보완
   </div>
 </section>
@@ -798,7 +809,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
     <span class="f-teal">사고심각도 10%</span>
   </div>
 
-  <div class="card-grid g4 anim anim-4" style="max-width:1120px;">
+  <div class="card-grid g4 anim anim-4" style="max-width:1280px;">
     <div class="card" style="border-color:rgba(232,69,60,0.25);">
       <div class="card-label" style="color:var(--red);">기상 · 40%</div>
       <div class="card-body" style="font-size:12px;">강수량·적설량·풍속·시정거리·기온<br>안개·폭우·폭설 최소 보정</div>
@@ -821,7 +832,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
     </div>
   </div>
 
-  <div class="anim anim-5" style="max-width:1120px;margin-top:16px;">
+  <div class="anim anim-5" style="max-width:1280px;margin-top:16px;">
     <div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-family:var(--mono);">위험 등급</div>
     <div class="grade-row">
       <div class="grade-cell" style="background:rgba(232,69,60,0.15);border-color:rgba(232,69,60,0.3);">
@@ -857,7 +868,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
   <div class="overline anim anim-1">프로그램 구조</div>
   <h2 class="slide-title anim anim-2">원천 데이터 → 최종 결과</h2>
 
-  <div class="flow anim anim-3" style="max-width:1120px;margin-top:24px;">
+  <div class="flow anim anim-3" style="max-width:1280px;margin-top:24px;">
     <div class="flow-box" style="border-color:rgba(96,165,250,0.3);">
       <strong>INPUT A</strong>
       교통사고 CSV<br>
@@ -889,7 +900,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
     </div>
   </div>
 
-  <div class="card-grid g3 anim anim-4" style="max-width:1120px;margin-top:24px;">
+  <div class="card-grid g3 anim anim-4" style="max-width:1280px;margin-top:24px;">
     <div style="background:rgba(255,255,255,0.02);border:1px solid var(--line);border-radius:8px;padding:16px;">
       <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:6px;">파일 1</div>
       <div style="font-family:var(--mono);font-size:13px;color:#60a5fa;">region_accident_<br>preprocessor.py</div>
@@ -914,7 +925,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
   <h2 class="slide-title anim anim-2">경기도 시·군 위험도 기준값</h2>
   <p class="subtitle anim anim-2" style="margin-bottom:20px;">KOROAD CSV → 31개 시·군 정규화 결과 (일부)</p>
 
-  <div class="split anim anim-3" style="max-width:1120px;align-items:start;">
+  <div class="split anim anim-3" style="max-width:1280px;align-items:start;">
     <div class="card" style="padding:0;overflow:hidden;">
       <table class="data-table">
         <thead>
@@ -992,7 +1003,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
   <h2 class="slide-title anim anim-2">9월 수도권 호우 분석</h2>
   <p style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:24px;" class="anim anim-2">2025년 9월 16~17일 · 18:00~익일 02:00 · 총 279행</p>
 
-  <div class="metric-ribbon anim anim-3" style="max-width:1120px;">
+  <div class="metric-ribbon anim anim-3" style="max-width:1280px;">
     <div class="metric-chip">
       <strong style="color:var(--white);">279</strong>
       <span>최종 결과 CSV 행 수</span>
@@ -1011,7 +1022,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
     </div>
   </div>
 
-  <div class="split anim anim-4" style="max-width:1120px;align-items:start;">
+  <div class="split anim anim-4" style="max-width:1280px;align-items:start;">
     <div>
       <div class="card-grid g3" style="margin-bottom:20px;">
         <div class="card" style="text-align:center;border-color:rgba(232,69,60,0.25);">
@@ -1054,7 +1065,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
   <h2 class="slide-title anim anim-2">지역·시간대별 위험도 패턴</h2>
   <p class="subtitle anim anim-2">지역 기준값과 시간대 위험도가 최종 점수 차이를 만든다</p>
 
-  <div class="split anim anim-3" style="max-width:1120px;align-items:start;">
+  <div class="split anim anim-3" style="max-width:1280px;align-items:start;">
     <div class="card" style="padding:20px;">
       <div style="font-size:13px;font-weight:500;margin-bottom:4px;">지역별 평균·최고 최종 위험도 Top 5</div>
       <div style="display:flex;gap:12px;margin-bottom:10px;font-size:11px;color:var(--muted);">
@@ -1085,7 +1096,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
   <div class="overline anim anim-1">분석 결론</div>
   <h2 class="slide-title anim anim-2">세 가지 핵심 발견</h2>
 
-  <div class="card-grid g3 anim anim-3" style="max-width:1120px;margin-top:28px;">
+  <div class="card-grid g3 anim anim-3" style="max-width:1280px;margin-top:28px;">
     <div class="concl-item">
       <div class="concl-num">결론 01</div>
       <p><strong style="color:var(--red);">안개·시정거리 저하</strong>가 단순 강수보다 평균 최종 위험도를 더 높게 만든다. (안개 61.5 vs 비 41.7)</p>
@@ -1100,7 +1111,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
     </div>
   </div>
 
-  <div class="anim anim-4" style="max-width:1120px;margin-top:24px;">
+  <div class="anim anim-4" style="max-width:1280px;margin-top:24px;">
     <div style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:10px;letter-spacing:0.08em;">한계 및 개선 방향</div>
     <div class="limit-row">
       <span class="limit-badge">①</span>
@@ -1124,7 +1135,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
   <div class="overline anim anim-1">다음 확장</div>
   <h2 class="slide-title anim anim-2">Project 5 —<br>웹 대시보드 시각화</h2>
 
-  <div class="split anim anim-3" style="max-width:1120px;margin-top:24px;">
+  <div class="split anim anim-3" style="max-width:1280px;margin-top:24px;">
     <div>
       <div class="next-card">
         <div class="next-card-title">기능 확장</div>
@@ -1171,7 +1182,7 @@ h2.slide-title em { font-style: normal; color: var(--red); }
       </div>
     </div>
     <div class="overline" style="justify-content:center;margin-bottom:16px;">경기도 악천후 교통사고 위험도 분석</div>
-    <h1 class="hero-title" style="font-size:clamp(32px,4vw,52px);margin-bottom:16px;">감사합니다</h1>
+    <h1 class="hero-title" style="font-size:clamp(42px,5vw,68px);margin-bottom:16px;">감사합니다</h1>
     <p style="font-size:15px;color:var(--muted);">응용프로그래밍개발 · Project 4</p>
     <div class="tag-row" style="justify-content:center;margin-top:32px;">
       <span class="tag">Python</span>

@@ -28,7 +28,7 @@
   --white:  #E8F4FD;
   --mono:   'JetBrains Mono', monospace;
   --sans:   'Noto Sans KR', sans-serif;
-  --content-max: 1200px;
+  --content-max: 1280px;
 }
 
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-family:var(--sans);color:var(--white);-webkit-font-smoothing:antialiased;}
@@ -39,7 +39,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
 .slide{
   position:absolute;inset:0;
   display:flex;flex-direction:column;justify-content:center;
-  padding:56px 92px;
+  padding:54px 72px;
   opacity:0;pointer-events:none;
   transform:translateX(50px);
   transition:opacity .42s cubic-bezier(.4,0,.2,1),transform .42s cubic-bezier(.4,0,.2,1);
@@ -70,8 +70,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
 
 /* ── CHROME ── */
 #progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--sky),var(--gold));transition:width .4s ease;z-index:200;}
-#counter {position:fixed;bottom:26px;right:40px;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.06em;z-index:200;}
-#hint    {position:fixed;bottom:26px;left:80px;font-family:var(--mono);font-size:10px;color:rgba(232,244,253,.16);letter-spacing:.05em;z-index:200;}
+#counter {position:fixed;bottom:26px;right:40px;font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.06em;z-index:200;}
+#hint    {position:fixed;bottom:26px;left:80px;font-family:var(--mono);font-size:11px;color:rgba(232,244,253,.16);letter-spacing:.05em;z-index:200;}
 #dots    {position:fixed;bottom:26px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:200;}
 .dot{width:5px;height:5px;border-radius:50%;background:var(--line2);cursor:pointer;transition:background .3s,transform .3s;}
 .dot.on {background:var(--sky);transform:scale(1.5);}
@@ -96,23 +96,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
 
 /* ── OVERLINE ── */
 .ov{
-  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--muted);margin-bottom:13px;
   display:flex;align-items:center;gap:10px;
 }
 .ov::before{content:'';display:inline-block;width:20px;height:1px;background:var(--sky);}
 
 /* ── TITLES ── */
-.th{font-size:clamp(46px,5.8vw,78px);font-weight:900;line-height:1.04;letter-spacing:-.03em;margin-bottom:20px;}
+.th{font-size:clamp(52px,6.3vw,88px);font-weight:900;line-height:1.04;letter-spacing:-.03em;margin-bottom:22px;}
 .th em{font-style:normal;color:var(--sky);}
-.ts{font-size:clamp(30px,3.7vw,52px);font-weight:800;line-height:1.12;letter-spacing:-.025em;margin-bottom:12px;}
+.ts{font-size:clamp(34px,4.1vw,58px);font-weight:800;line-height:1.12;letter-spacing:-.025em;margin-bottom:14px;}
 .ts em{font-style:normal;color:var(--sky);}
-.sub{font-size:16px;color:var(--sub);line-height:1.65;max-width:620px;margin-bottom:34px;}
+.sub{font-size:17.5px;color:var(--sub);line-height:1.7;max-width:760px;margin-bottom:36px;}
 .slide > .sub{max-width:var(--content-max);}
 
 /* ── CHIPS ── */
 .chip{
-  font-family:var(--mono);font-size:11px;letter-spacing:.04em;
+  font-family:var(--mono);font-size:12px;letter-spacing:.04em;
   padding:4px 10px;border-radius:4px;display:inline-block;
   background:rgba(59,158,222,.12);border:1px solid rgba(59,158,222,.28);color:rgba(59,158,222,.9);
 }
@@ -124,18 +124,18 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
 .chip-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:30px;}
 
 /* ── CARDS ── */
-.grid{display:grid;gap:16px;width:100%;}
+.grid{display:grid;gap:18px;width:100%;}
 .g2{grid-template-columns:1fr 1fr;}
 .g3{grid-template-columns:1fr 1fr 1fr;}
 .g4{grid-template-columns:repeat(4,1fr);}
 .g5{grid-template-columns:repeat(5,1fr);}
-.split{display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:start;}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:38px;align-items:start;}
 
-.card{background:var(--bg3);border:1px solid var(--line2);border-radius:12px;padding:24px;transition:border-color .25s;}
+.card{background:var(--bg3);border:1px solid var(--line2);border-radius:12px;padding:28px;transition:border-color .25s;}
 .card:hover{border-color:rgba(59,158,222,.32);}
-.ov2{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
-.ct{font-size:16px;font-weight:600;line-height:1.35;margin-bottom:6px;}
-.cb{font-size:13.5px;color:var(--sub);line-height:1.68;}
+.ov2{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+.ct{font-size:18px;font-weight:600;line-height:1.35;margin-bottom:7px;}
+.cb{font-size:14.8px;color:var(--sub);line-height:1.72;}
 
 .card-s {border-color:rgba(59,158,222,.3); background:rgba(59,158,222,.06);}
 .card-g {border-color:rgba(22,163,74,.3);  background:rgba(22,163,74,.05);}
@@ -144,7 +144,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
 .card-p {border-color:rgba(124,58,237,.3); background:rgba(124,58,237,.05);}
 
 /* ── HIGHLIGHT ── */
-.hl{border-left:3px solid var(--sky);padding:12px 16px;background:rgba(59,158,222,.07);border-radius:0 8px 8px 0;font-size:13.5px;line-height:1.7;color:var(--sub);margin:12px 0;}
+.hl{border-left:3px solid var(--sky);padding:13px 17px;background:rgba(59,158,222,.07);border-radius:0 8px 8px 0;font-size:14.5px;line-height:1.75;color:var(--sub);margin:12px 0;}
 .hl.g {border-left-color:var(--green); background:rgba(22,163,74,.06);}
 .hl.a {border-left-color:var(--gold);  background:rgba(245,158,11,.06);}
 .hl.r {border-left-color:var(--red);   background:rgba(220,38,38,.06);}
@@ -152,14 +152,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
 
 /* ── STEP ── */
 .step{display:flex;gap:13px;margin-bottom:12px;align-items:flex-start;}
-.sn{width:26px;height:26px;border-radius:50%;border:1px solid var(--line2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px;}
-.step h4{font-size:15px;font-weight:500;margin-bottom:3px;}
-.step p {font-size:13px;color:var(--muted);line-height:1.58;}
+.sn{width:28px;height:28px;border-radius:50%;border:1px solid var(--line2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px;}
+.step h4{font-size:16px;font-weight:500;margin-bottom:3px;}
+.step p {font-size:14px;color:var(--muted);line-height:1.62;}
 
 /* ── STATUS PILL ── */
 .status-pill{
   display:inline-flex;align-items:center;gap:6px;
-  font-size:12px;font-weight:500;font-family:var(--mono);
+  font-size:13px;font-weight:500;font-family:var(--mono);
   padding:5px 12px;border-radius:999px;
 }
 .s-재실  {background:rgba(22,163,74,.18); border:1px solid rgba(22,163,74,.35);  color:#4ade80;}
@@ -172,15 +172,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
 .sdot{width:7px;height:7px;border-radius:50%;background:currentColor;}
 
 /* ── ARCH ROW ── */
-.ar{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;}
+.ar{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:14px;}
 .ar:last-child{border-bottom:none;}
 .ai{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
 .an{font-weight:500;width:160px;flex-shrink:0;}
-.ad{color:var(--muted);line-height:1.5;font-size:12.5px;}
+.ad{color:var(--muted);line-height:1.55;font-size:13.5px;}
 
 /* ── FLOW ── */
 .flow{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:16px 0;}
-.fb{background:var(--bg3);border:1px solid var(--line2);border-radius:8px;padding:10px 14px;font-size:12px;text-align:center;line-height:1.5;}
+.fb{background:var(--bg3);border:1px solid var(--line2);border-radius:8px;padding:11px 15px;font-size:13px;text-align:center;line-height:1.55;}
 .fb strong{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
 .fa{color:var(--muted);font-size:16px;}
 
@@ -192,24 +192,24 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
 .ps-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
 .ps-lbl.r{color:rgba(220,38,38,.7);}
 .ps-lbl.g{color:rgba(22,163,74,.7);}
-.ps-body{font-size:13px;line-height:1.6;color:var(--sub);}
+.ps-body{font-size:14px;line-height:1.65;color:var(--sub);}
 
 /* ── DB PATH ── */
-.db-line{font-family:var(--mono);font-size:12px;line-height:2;color:var(--sub);}
+.db-line{font-family:var(--mono);font-size:13px;line-height:2.05;color:var(--sub);}
 .db-k {color:var(--sky);}
 .db-v {color:rgba(245,158,11,.8);}
 .db-c {color:var(--muted);}
 
 /* ── SCREEN CARD ── */
-.screen-card{background:var(--bg3);border:1px solid var(--line2);border-radius:12px;padding:22px 24px;}
+.screen-card{background:var(--bg3);border:1px solid var(--line2);border-radius:12px;padding:26px 28px;}
 .sc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.sc-file{font-family:var(--mono);font-size:11px;color:var(--sky);}
-.sc-title{font-size:15px;font-weight:600;margin-bottom:5px;}
-.sc-role{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
-.sc-body{font-size:12.5px;color:var(--sub);line-height:1.65;}
+.sc-file{font-family:var(--mono);font-size:12px;color:var(--sky);}
+.sc-title{font-size:17px;font-weight:600;margin-bottom:5px;}
+.sc-role{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.sc-body{font-size:13.8px;color:var(--sub);line-height:1.7;}
 
 /* ── LIMIT ── */
-.li{display:flex;gap:11px;margin-bottom:11px;font-size:13px;color:var(--sub);line-height:1.6;align-items:flex-start;}
+.li{display:flex;gap:11px;margin-bottom:11px;font-size:14px;color:var(--sub);line-height:1.65;align-items:flex-start;}
 .lb{font-family:var(--mono);font-size:10px;background:rgba(255,255,255,.05);border:1px solid var(--line2);border-radius:4px;padding:2px 6px;color:var(--muted);flex-shrink:0;margin-top:2px;}
 
 /* ── DECO ── */
@@ -217,14 +217,25 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
 
 /* ── MOCK SEAT CARD ── */
 .seat{border-radius:10px;padding:12px 14px;border:2px solid transparent;text-align:center;transition:all .2s;}
-.seat-name{font-size:14px;font-weight:700;margin-bottom:2px;}
-.seat-role{font-size:11px;color:var(--muted);margin-bottom:8px;}
-.seat-st{font-size:11px;font-family:var(--mono);}
+.seat-name{font-size:15.5px;font-weight:700;margin-bottom:2px;}
+.seat-role{font-size:12px;color:var(--muted);margin-bottom:8px;}
+.seat-st{font-size:12px;font-family:var(--mono);}
 .seat-재실  {background:rgba(22,163,74,.12); border-color:rgba(22,163,74,.3);}
 .seat-수업중{background:rgba(217,119,6,.12); border-color:rgba(217,119,6,.3);}
 .seat-회의  {background:rgba(124,58,237,.12);border-color:rgba(124,58,237,.3);}
 .seat-출장  {background:rgba(8,145,178,.12); border-color:rgba(8,145,178,.3);}
 .seat-퇴근  {background:rgba(71,85,105,.15); border-color:rgba(71,85,105,.3);}
+
+/* ── PRESENTATION SCALE ── */
+.slide [style*="font-size:10px"] { font-size: 11.5px !important; }
+.slide [style*="font-size:11px"] { font-size: 12.5px !important; }
+.slide [style*="font-size:12px"] { font-size: 14px !important; }
+.slide [style*="font-size:12.5px"] { font-size: 14.5px !important; }
+.slide [style*="font-size:13px"] { font-size: 15px !important; }
+.slide [style*="font-size:13.5px"] { font-size: 15.5px !important; }
+.slide [style*="font-size:14px"] { font-size: 16px !important; }
+.slide [style*="font-size:15px"] { font-size: 17px !important; }
+.slide [style*="font-size:16px"] { font-size: 18px !important; }
 
 @media (max-width:900px){
   .slide{padding:42px 28px;}
@@ -253,7 +264,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
   <div class="ov a d1">탐구 보고서 · 웹 시스템 개발</div>
   <h1 class="th a d2"><em>Jari</em> · 자리</h1>
   <p style="font-size:clamp(17px,2.1vw,26px);font-weight:500;color:var(--sub);margin-bottom:12px;letter-spacing:-.01em;" class="a d3">교무실 자리 배치 및 교사 호출 시스템</p>
-  <p style="font-size:15px;color:var(--muted);line-height:1.65;max-width:1200px;" class="a d4">
+  <p style="font-size:15px;color:var(--muted);line-height:1.65;max-width:1280px;" class="a d4">
     Firebase Realtime Database · Google 인증<br>
     실시간 상태 공유 · 학생 호출 · TTS 음성 안내
   </p>
@@ -275,7 +286,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
   <div class="ov a d1">탐구 동기</div>
   <h2 class="ts a d2">왜 만들었나</h2>
 
-  <div class="split a d3" style="max-width:1200px;margin-top:16px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
     <div>
       <div class="card card-r" style="margin-bottom:12px;padding:20px;">
         <div class="ov2" style="color:rgba(220,38,38,.7);">기존 방식의 문제</div>
@@ -324,7 +335,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
   <div class="ov a d1">시스템 개요</div>
   <h2 class="ts a d2">5개 화면, 역할 분리</h2>
 
-  <div class="grid g3 a d3" style="max-width:1200px;margin-top:18px;">
+  <div class="grid g3 a d3" style="max-width:1280px;margin-top:18px;">
     <div class="screen-card">
       <div class="sc-top">
         <span class="sc-file">index.html</span>
@@ -387,7 +398,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
   <div class="ov a d1">사용자 역할</div>
   <h2 class="ts a d2">누가 어떻게 쓰나</h2>
 
-  <div class="grid g3 a d3" style="max-width:1200px;margin-top:18px;">
+  <div class="grid g3 a d3" style="max-width:1280px;margin-top:18px;">
     <div class="card card-s" style="padding:24px;">
       <div style="font-size:22px;margin-bottom:10px;">🎒</div>
       <div class="ov2" style="color:rgba(59,158,222,.7);">학생 · 방문자</div>
@@ -426,7 +437,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
     </div>
   </div>
 
-  <div class="a d4" style="max-width:1200px;margin-top:14px;">
+  <div class="a d4" style="max-width:1280px;margin-top:14px;">
     <div style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:8px;">선생님 상태값 (호출 가능: 재실만)</div>
     <div style="display:flex;gap:7px;flex-wrap:wrap;">
       <span class="status-pill s-재실"><span class="sdot"></span>재실</span>
@@ -446,7 +457,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
   <div class="ov a d1">기술 스택</div>
   <h2 class="ts a d2">아키텍처</h2>
 
-  <div class="split a d3" style="max-width:1200px;margin-top:16px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
     <div>
       <div class="ar"><div class="ai" style="background:rgba(245,158,11,.15);">🔥</div><div class="an"><span class="chip a" style="font-size:10px;">Firebase RTDB</span></div><div class="ad">실시간 데이터베이스. 상태·호출·자리 배치 저장</div></div>
       <div class="ar"><div class="ai" style="background:rgba(22,163,74,.13);">🔐</div><div class="an"><span class="chip g" style="font-size:10px;">Firebase Auth</span></div><div class="ad">Google 로그인. 선생님·관리자 인증</div></div>
@@ -478,7 +489,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
   <div class="ov a d1">데이터 설계</div>
   <h2 class="ts a d2">Firebase Realtime Database 구조</h2>
 
-  <div class="split a d3" style="max-width:1200px;margin-top:16px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
     <div class="card" style="padding:20px;">
       <div class="ov2">schools 경로 — 공간 정보</div>
       <div class="db-line" style="margin-top:10px;">
@@ -521,7 +532,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
   <div class="ov a d1">핵심 기능 · board.html</div>
   <h2 class="ts a d2">교무실 <em>현황판</em></h2>
 
-  <div class="split a d3" style="max-width:1200px;margin-top:16px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
     <div>
       <div class="grid g2" style="gap:10px;margin-bottom:12px;">
         <!-- mock seat cards -->
@@ -578,7 +589,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
   <div class="ov a d1">핵심 기능 · call.html</div>
   <h2 class="ts a d2">호출 <em>현황판</em> & 음성 안내</h2>
 
-  <div class="split a d3" style="max-width:1200px;margin-top:16px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
     <div>
       <div class="step">
         <div class="sn" style="border-color:rgba(59,158,222,.3);color:var(--sky);">1</div>
@@ -625,7 +636,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
   <div class="ov a d1">인증 & 권한 설계</div>
   <h2 class="ts a d2">누가 무엇을 할 수 있나</h2>
 
-  <div class="split a d3" style="max-width:1200px;margin-top:16px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
     <div>
       <div class="ar"><div class="ai" style="background:rgba(59,158,222,.15);">🎒</div><div class="an" style="font-size:13px;">학생 (비로그인)</div><div class="ad">현황판 조회 · 재실 선생님 호출만 가능. 인증 불필요.</div></div>
       <div class="ar"><div class="ai" style="background:rgba(22,163,74,.13);">👤</div><div class="an" style="font-size:13px;">선생님 (Google 로그인)</div><div class="ad">본인 uid의 status·info만 갱신. 이메일로 자리 자동 매핑.</div></div>
@@ -656,7 +667,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
   <div class="ov a d1">구현 중 고려한 문제</div>
   <h2 class="ts a d2">설계 결정과 해결</h2>
 
-  <div class="grid g3 a d3" style="max-width:1200px;margin-top:18px;">
+  <div class="grid g3 a d3" style="max-width:1280px;margin-top:18px;">
     <div>
       <div class="ps" style="margin-bottom:10px;">
         <div class="ps-box ps-r">
@@ -743,7 +754,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
   <div class="ov a d1">관리자 & 확장성</div>
   <h2 class="ts a d2">코드 수정 없이<br>구조 변경 가능</h2>
 
-  <div class="split a d3" style="max-width:1200px;margin-top:16px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:16px;align-items:start;">
     <div>
       <div class="card card-s" style="padding:20px;margin-bottom:12px;">
         <div class="ov2" style="color:rgba(59,158,222,.7);">admin.html 기능</div>
@@ -795,7 +806,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
   <div class="ov a d1">한계 및 개선 방향</div>
   <h2 class="ts a d2">솔직한 한계 분석</h2>
 
-  <div class="split a d3" style="max-width:1200px;margin-top:18px;align-items:start;">
+  <div class="split a d3" style="max-width:1280px;margin-top:18px;align-items:start;">
     <div>
       <div style="font-size:13px;color:var(--muted);font-family:var(--mono);margin-bottom:10px;">현재 한계</div>
       <div class="li"><span class="lb">①</span><span><strong>PIN 검증이 클라이언트 중심</strong> — 강력한 보안 인증이 아닌 오작동 방지 장치. 서버 측 검증 강화 필요.</span></div>
@@ -835,7 +846,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
   <div class="ov a d1">결론</div>
   <h2 class="ts a d2">탐구 요약</h2>
 
-  <div class="grid g3 a d3" style="max-width:1200px;margin-top:18px;">
+  <div class="grid g3 a d3" style="max-width:1280px;margin-top:18px;">
     <div class="card card-s" style="padding:20px;">
       <div class="ov2" style="color:rgba(59,158,222,.7);">실제 문제 → 기술 해결</div>
       <div class="ct">학교 현장의 비효율을 웹으로</div>
@@ -853,11 +864,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
     </div>
   </div>
 
-  <div class="hl a d4" style="max-width:1200px;margin-top:14px;font-size:14px;">
+  <div class="hl a d4" style="max-width:1280px;margin-top:14px;font-size:14px;">
     <strong>배운 점</strong>: 웹 개발은 화면을 만드는 것이 아니라 <strong>실제 사용자의 행동 흐름과 운영 상황</strong>을 함께 고려하는 일. 기능 구현만으로는 부족하며, 인증과 권한 설계가 실제 서비스의 핵심임을 체감.
   </div>
 
-  <div class="grid g4 a d5" style="max-width:1200px;margin-top:12px;">
+  <div class="grid g4 a d5" style="max-width:1280px;margin-top:12px;">
     <div class="card" style="padding:14px;text-align:center;">
       <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--sky);">5</div>
       <div style="font-size:11px;color:var(--muted);margin-top:2px;">화면 구성</div>
@@ -886,7 +897,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
   <div style="text-align:center;position:relative;z-index:1;" class="a d1">
     <div style="width:84px;height:84px;border-radius:18px;background:rgba(59,158,222,.13);border:1px solid rgba(59,158,222,.28);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:26px;font-weight:700;color:var(--sky);margin:0 auto 26px;letter-spacing:.02em;">자리</div>
     <div class="ov" style="justify-content:center;margin-bottom:14px;">교무실 자리 배치 및 교사 호출 시스템</div>
-    <h1 class="th" style="font-size:clamp(34px,5vw,58px);margin-bottom:14px;">감사합니다</h1>
+    <h1 class="th" style="font-size:clamp(44px,5.8vw,72px);margin-bottom:14px;">감사합니다</h1>
     <p style="font-size:15px;color:var(--muted);">탐구 보고서 · Firebase 기반 웹 시스템 개발</p>
     <div class="chip-row" style="justify-content:center;margin-top:28px;">
       <span class="chip">Firebase RTDB</span>
