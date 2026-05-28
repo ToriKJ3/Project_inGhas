@@ -678,7 +678,7 @@
   <span class="logo">Project Plan 2026</span>
   <div class="nav-controls">
     <button class="nav-btn" onclick="prevSlide()">← 이전</button>
-    <span class="slide-counter" id="counter">1 / 20</span>
+    <span class="slide-counter" id="counter">1 / 22</span>
     <button class="nav-btn" onclick="nextSlide()">다음 →</button>
   </div>
 </nav>
@@ -695,7 +695,7 @@
         <div class="eyebrow">대입을 위한 교과별 프로젝트 정리</div>
         <h1>프로젝트 계획 및 소개</h1>
         <div class="accent-line"></div>
-        <div class="subtitle">컴퓨터공학적 역량 중심의 자율주행·실무형 응용 프로젝트 9선</div>
+        <div class="subtitle">컴퓨터공학적 역량 중심의 자율주행·실무형 응용 프로젝트 10선</div>
       </div>
       <div class="progress-bar" style="width:7.14%"></div>
     </div>
@@ -728,9 +728,9 @@
     </div>
 
     <!-- SLIDE 3: 프로젝트 구성 -->
-    <div class="slide s-dark" data-thumb="9개 프로젝트 구성">
+    <div class="slide s-dark" data-thumb="10개 프로젝트 구성">
       <div class="slide-label">Overview</div>
-      <div class="slide-title">9개 프로젝트 구성</div>
+      <div class="slide-title">10개 프로젝트 구성</div>
       <div class="cat-grid" style="grid-template-columns:repeat(4,1fr);">
         <div class="cat-card delay-1" style="border-color:rgba(46,124,246,0.25);">
           <div class="cat-num c-hw">2</div>
@@ -743,9 +743,9 @@
           <div style="margin-top:8px;font-size:clamp(9px,1.1vw,13px);color:rgba(255,255,255,0.4);line-height:1.5;">알고리즘 비교 · 데이터 분석 · 점수화 모델</div>
         </div>
         <div class="cat-card delay-3" style="border-color:rgba(127,100,220,0.25);">
-          <div class="cat-num" style="color:#a78bfa;">2</div>
+          <div class="cat-num" style="color:#a78bfa;">3</div>
           <div class="cat-label">UI · 실무형 앱</div>
-          <div style="margin-top:8px;font-size:clamp(9px,1.1vw,13px);color:rgba(255,255,255,0.4);line-height:1.5;">웹 대시보드 · Dojae 앱</div>
+          <div style="margin-top:8px;font-size:clamp(9px,1.1vw,13px);color:rgba(255,255,255,0.4);line-height:1.5;">웹 대시보드 · Dojae 앱 · Jari 시스템</div>
         </div>
         <div class="cat-card delay-4" style="border-color:rgba(232,93,117,0.25);">
           <div class="cat-num" style="color:#f87171;">2</div>
@@ -1169,7 +1169,103 @@
       <div class="progress-bar" style="width:90%"></div>
     </div>
 
-    <!-- SLIDE 15: 전체 프로젝트 구조 요약 -->
+    <!-- SLIDE 15: Project 10 -->
+    <div class="slide s-split" data-thumb="P10. Jari 시스템">
+      <div class="proj-left" style="background:linear-gradient(160deg,#052b3a,#12304d 58%,#3a2607);">
+        <div class="proj-num">Project 10 — 실시간 웹 시스템 ⭐</div>
+        <div class="proj-title">Jari<br>교무실 자리 배치 및 교사 호출 시스템</div>
+        <div class="proj-subject" style="background:rgba(59,158,222,0.14);border-color:rgba(59,158,222,0.3);color:#7db3ff;">📚 개인 웹 시스템 개발</div>
+        <div class="proj-desc">
+          학생이 선생님을 찾기 위해 교무실을 직접 방문해야 하는 불편을 줄이기 위해, 교무실 자리 배치와 교사 상태를 실시간으로 공유하는 웹 시스템을 구현했다. 재실 상태인 교사에게만 호출을 보낼 수 있고, 교무실 화면에서는 호출을 크게 표시하고 음성으로 안내한다.
+        </div>
+        <div class="tag-row" style="margin-top:12px;">
+          <span class="tag" style="background:rgba(59,158,222,0.12);border-color:rgba(59,158,222,0.28);color:#7db3ff;">Firebase RTDB</span>
+          <span class="tag" style="background:rgba(0,198,167,0.1);border-color:rgba(0,198,167,0.25);color:var(--accent);">Auth</span>
+          <span class="tag t-amber">Cloud Functions</span>
+          <span class="tag">TTS</span>
+        </div>
+      </div>
+      <div class="proj-right">
+        <div class="info-row delay-1">
+          <div class="info-row-label">문제 출발점</div>
+          <div class="info-row-val">선생님이 자리에 계신지 알 수 없어 학생이 교무실을 헛걸음하거나, 교무실 내부에서 특정 교사를 반복해서 찾는 문제</div>
+        </div>
+        <div class="info-row delay-2">
+          <div class="info-row-label">주요 기능</div>
+          <div class="info-row-val">교무실 자리 배치 시각화 · 교사 상태 표시 · 재실 조건부 호출 · 호출 현황판 · TTS 음성 안내 · 관리자 편집</div>
+        </div>
+        <div class="info-row delay-3">
+          <div class="info-row-label">화면 구성</div>
+          <div class="info-row-val">board.html 학생/현황판 · teacher.html 교사 상태 변경 · admin.html 자리/교무실 관리 · functions TTS 프록시</div>
+        </div>
+        <div class="info-row delay-4">
+          <div class="info-row-label">핵심 구현</div>
+          <div class="info-row-val">Firebase Realtime Database 구독으로 상태·호출·자리 변경을 새로고침 없이 모든 화면에 즉시 반영</div>
+        </div>
+        <div class="info-row delay-5" style="border-color:rgba(59,158,222,0.25);">
+          <div class="info-row-label" style="color:#7db3ff;">강조 역량</div>
+          <div class="info-row-val">실사용 문제 정의 · 실시간 DB 설계 · 사용자 역할 분리 · 보안/편의 균형 · 학교 현장형 서비스 구현</div>
+        </div>
+      </div>
+      <div class="progress-bar" style="width:92%"></div>
+    </div>
+
+    <!-- SLIDE 16: Project 10 구현 구조 -->
+    <div class="slide s-dark" data-thumb="P10. 구현 구조">
+      <div class="slide-label">Project 10 Implementation</div>
+      <div class="slide-title">Jari 핵심 구현 구조</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px;">
+        <div class="cat-card delay-1" style="text-align:left;border-color:rgba(59,158,222,0.25);">
+          <div style="font-size:clamp(12px,1.4vw,16px);font-weight:700;color:#7db3ff;margin-bottom:8px;">학생 현황판</div>
+          <div style="font-size:clamp(10px,1.1vw,13px);color:rgba(255,255,255,0.62);line-height:1.65;">교무실 선택<br>자리 배치 조회<br>재실 교사 호출<br>확대·드래그 탐색</div>
+        </div>
+        <div class="cat-card delay-2" style="text-align:left;border-color:rgba(0,198,167,0.25);">
+          <div style="font-size:clamp(12px,1.4vw,16px);font-weight:700;color:var(--accent);margin-bottom:8px;">교사 화면</div>
+          <div style="font-size:clamp(10px,1.1vw,13px);color:rgba(255,255,255,0.62);line-height:1.65;">Google 로그인<br>상태 변경<br>이메일 기반 자리 연결<br>개인 정보 갱신</div>
+        </div>
+        <div class="cat-card delay-3" style="text-align:left;border-color:rgba(240,180,41,0.25);">
+          <div style="font-size:clamp(12px,1.4vw,16px);font-weight:700;color:#f0b429;margin-bottom:8px;">교무실 디스플레이</div>
+          <div style="font-size:clamp(10px,1.1vw,13px);color:rgba(255,255,255,0.62);line-height:1.65;">호출 실시간 수신<br>대형 화면 알림<br>TTS 음성 안내<br>21시 자동 마감</div>
+        </div>
+        <div class="cat-card delay-4" style="text-align:left;border-color:rgba(167,139,250,0.25);">
+          <div style="font-size:clamp(12px,1.4vw,16px);font-weight:700;color:#a78bfa;margin-bottom:8px;">관리자</div>
+          <div style="font-size:clamp(10px,1.1vw,13px);color:rgba(255,255,255,0.62);line-height:1.65;">학교·교무실 관리<br>자리 카드 편집<br>이메일 매핑<br>PIN 보호</div>
+        </div>
+      </div>
+      <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px;min-height:0;">
+        <div style="display:flex;flex-direction:column;gap:9px;">
+          <div class="info-row delay-4">
+            <div class="info-row-label">데이터 구조</div>
+            <div class="info-row-val">schools · offices · seats · teachers · calls를 분리해 학교/교무실 단위 확장이 가능한 Realtime Database 구조 설계</div>
+          </div>
+          <div class="info-row delay-5">
+            <div class="info-row-label">호출 안전장치</div>
+            <div class="info-row-val">호출창을 여는 시점과 전송 직전에 교사 상태를 다시 확인해, 재실 상태가 아니면 호출을 차단</div>
+          </div>
+          <div class="info-row">
+            <div class="info-row-label">TTS 프록시</div>
+            <div class="info-row-val">Supertone API 키를 클라이언트에 노출하지 않도록 Cloud Functions에서 음성 안내 요청을 중계</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:9px;">
+          <div class="info-row delay-4">
+            <div class="info-row-label">운영 자동화</div>
+            <div class="info-row-val">21시 이전 호출 자동 삭제, 교사 상태 일괄 퇴근 처리, 24시간 지난 호출 정리로 데이터 누적 방지</div>
+          </div>
+          <div class="info-row delay-5">
+            <div class="info-row-label">관리 편의성</div>
+            <div class="info-row-val">교무실 구조 변경 시 코드 수정 없이 관리자 화면에서 자리 위치·크기·회전·교사 이메일을 편집</div>
+          </div>
+          <div class="info-row" style="border-color:rgba(59,158,222,0.22);">
+            <div class="info-row-label" style="color:#7db3ff;">탐구 의미</div>
+            <div class="info-row-val">단순 페이지 제작을 넘어 실시간 동기화, 권한, 외부 API, 대형 화면 UX까지 연결한 학교 현장형 서비스</div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-bar" style="width:94%"></div>
+    </div>
+
+    <!-- SLIDE 17: 전체 프로젝트 구조 요약 -->
     <div class="slide s-dark" data-thumb="전체 구조 요약">
       <div class="slide-label">Summary</div>
       <div class="slide-title">최종 프로젝트 구조 일람</div>
@@ -1194,13 +1290,14 @@
             <tr><td><span class="n-badge">7</span></td><td>교통 위험도 점수화 모델 설계</td><td>수학 보완</td><td><span class="category-pill cp-math">수학/모델링</span></td><td>서강·단국·연세</td></tr>
             <tr><td><span class="n-badge">8</span></td><td>속도·제동거리 기반 안전거리 분석</td><td>자율주행 자동차</td><td><span class="category-pill cp-math">물리/차량</span></td><td>한양·건국·연세</td></tr>
             <tr><td><span class="n-badge">9</span></td><td>Dojae 현장실습 출결 자동화 앱 개발</td><td>도제/개인 앱 개발</td><td><span class="category-pill cp-app">앱/운영</span></td><td>가천·단국·서강</td></tr>
+            <tr><td><span class="n-badge">10</span></td><td>Jari 교무실 자리 배치 및 교사 호출 시스템</td><td>개인 웹 시스템 개발</td><td><span class="category-pill cp-app">실시간 웹</span></td><td>가천·단국·서강</td></tr>
           </tbody>
         </table>
       </div>
       <div class="progress-bar" style="width:85.71%"></div>
     </div>
 
-    <!-- SLIDE 16: 대학별 활용 -->
+    <!-- SLIDE 18: 대학별 활용 -->
     <div class="slide s-dark" data-thumb="대학별 활용 전략">
       <div class="slide-label">University Strategy</div>
       <div class="slide-title">대학별 핵심 활용 전략</div>
@@ -1213,7 +1310,7 @@
         <div class="uni-card delay-2" style="border-color:rgba(127,100,220,0.2);">
           <div class="uni-name">서강대</div>
           <div class="uni-dept">컴퓨터공학과</div>
-          <div class="uni-msg">P3·P4·P7·P9·P5<br>AI·알고리즘·데이터·실사용 앱</div>
+          <div class="uni-msg">P3·P4·P7·P9·P10<br>AI·알고리즘·데이터·실시간 서비스</div>
         </div>
         <div class="uni-card delay-3" style="border-color:rgba(46,124,246,0.2);">
           <div class="uni-name">건국대</div>
@@ -1223,12 +1320,12 @@
         <div class="uni-card delay-2" style="border-color:rgba(240,180,41,0.2);">
           <div class="uni-name">단국대</div>
           <div class="uni-dept">컴퓨터공학과</div>
-          <div class="uni-msg">P4·P9·P5·P7·P3<br>데이터 분석·앱 구현·시각화</div>
+          <div class="uni-msg">P4·P9·P10·P5·P7<br>데이터 분석·앱 구현·실시간 DB</div>
         </div>
         <div class="uni-card delay-3" style="border-color:rgba(0,198,100,0.2);">
           <div class="uni-name">가천대</div>
           <div class="uni-dept">컴퓨터공학과</div>
-          <div class="uni-msg">P9·P5·P4·P1·P3<br>앱·DB·UI/UX·실무형 개발</div>
+          <div class="uni-msg">P9·P10·P5·P4·P3<br>앱·DB·UI/UX·실무형 개발</div>
         </div>
         <div class="uni-card delay-4" style="border-color:rgba(232,93,117,0.2);">
           <div class="uni-name">연세대</div>
@@ -1239,7 +1336,7 @@
       <div class="progress-bar" style="width:92.85%"></div>
     </div>
 
-    <!-- SLIDE 17: 진행상황 전체 요약 -->
+    <!-- SLIDE 19: 진행상황 전체 요약 -->
     <div class="slide s-dark" data-thumb="진행상황 전체 요약">
       <div class="slide-label">Progress Overview</div>
       <div class="slide-title">프로젝트 진행상황 전체 요약</div>
@@ -1249,7 +1346,7 @@
       <div class="progress-bar" style="width:93.75%"></div>
     </div>
 
-    <!-- SLIDE 18: 진행상황 상세 -->
+    <!-- SLIDE 20: 진행상황 상세 -->
     <div class="slide s-dark" data-thumb="진행상황 상세">
       <div class="slide-label">Progress Detail</div>
       <div class="slide-title">프로젝트별 세부 진행 현황</div>
@@ -1266,7 +1363,7 @@
       <div class="progress-bar" style="width:100%"></div>
     </div>
 
-    <!-- SLIDE 19: Conclusion -->
+    <!-- SLIDE 21: Conclusion -->
     <div class="slide s-conclusion" data-thumb="마무리">
       <div style="position:relative;z-index:2;width:100%;">
         <div class="slide-label" style="text-align:center;margin-bottom:1rem;">Final Direction</div>
@@ -1274,14 +1371,14 @@
         <div class="quote-box" style="animation:fadeUp 0.6s ease 0.2s both;">
           <div class="quote-text">
             자율주행이라는 진로 관심을 바탕으로 하되,<br>
-            각 교과와 실사용 앱 개발에서 <span style="color:var(--accent);font-weight:500">알고리즘, 데이터 분석, UI 구현, AI 윤리,<br>임베디드 시스템, 수학·물리 모델링, 클라우드 앱 운영</span> 등<br>
+            각 교과와 실사용 앱 개발에서 <span style="color:var(--accent);font-weight:500">알고리즘, 데이터 분석, UI 구현, AI 윤리,<br>임베디드 시스템, 수학·물리 모델링, 실시간 DB·클라우드 운영</span> 등<br>
             컴퓨터공학적 역량을 <strong style="color:#fff">분리하여</strong> 보여주는 프로젝트 구성을 만든다.
           </div>
         </div>
         <div style="display:flex;gap:10px;justify-content:center;margin-top:1.5rem;flex-wrap:wrap;animation:fadeUp 0.5s ease 0.5s both;">
           <span class="tag t-green" style="font-size:clamp(11px,1.2vw,14px);padding:5px 14px;">✅ 미니카 = 커넥티드 카만</span>
           <span class="tag t-green" style="font-size:clamp(11px,1.2vw,14px);padding:5px 14px;">✅ P4·P5 컴공 대학 핵심</span>
-          <span class="tag t-green" style="font-size:clamp(11px,1.2vw,14px);padding:5px 14px;">✅ P9 실사용 앱 개발</span>
+          <span class="tag t-green" style="font-size:clamp(11px,1.2vw,14px);padding:5px 14px;">✅ P9·P10 실사용 서비스</span>
           <span class="tag t-green" style="font-size:clamp(11px,1.2vw,14px);padding:5px 14px;">✅ 수학·물리 2개 추가</span>
           <span class="tag t-green" style="font-size:clamp(11px,1.2vw,14px);padding:5px 14px;">✅ 산출물 명확히 남기기</span>
         </div>
@@ -1289,19 +1386,19 @@
       <div class="progress-bar" style="width:100%;"></div>
     </div>
 
-    <!-- SLIDE 20: 열정 클로징 -->
+    <!-- SLIDE 22: 열정 클로징 -->
     <div class="slide s-final" data-thumb="나는 해낼 것이다">
       <div class="s-final-content">
         <div class="final-kicker">Why not?</div>
         <div class="final-main">
           Do My Best<br>
-          <strong>9개, 1학기.</strong><br>
+          <strong>10개, 1학기.</strong><br>
           꼭 해낼 것이다.
         </div>
         <div class="final-line"></div>
         <div class="final-quote">
           "촉박하면 집중된다. 많으면 단단해진다."<br>
-          9개의 프로젝트는 부담이 아니라 <span>나를 증명하는 9번의 기회다.</span>
+          10개의 프로젝트는 부담이 아니라 <span>나를 증명하는 10번의 기회다.</span>
         </div>
         <div class="final-badge">
           <span class="final-dot"></span>
@@ -1377,6 +1474,12 @@
     },
     {
       label: 'P9. 도제 지원 어플리케이션 제작',
+      progress: 100,
+      status: 'done',
+      note: '완료'
+    },
+    {
+      label: 'P10. 교무실 자리표 및 호출 시스템 구현',
       progress: 100,
       status: 'done',
       note: '완료'
