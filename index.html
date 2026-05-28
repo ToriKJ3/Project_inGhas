@@ -401,6 +401,33 @@
     border-color: rgba(240,180,41,0.25);
     color: #f0b429;
   }
+  .detail-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    margin-top: 14px;
+    padding: 8px 13px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.16);
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    font-size: clamp(10px, 1.1vw, 13px);
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  }
+  .detail-link:hover {
+    background: rgba(255,255,255,0.14);
+    border-color: rgba(255,255,255,0.28);
+    transform: translateY(-1px);
+  }
+  .detail-link span {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--accent);
+    font-size: 1.05em;
+    line-height: 1;
+  }
 
   /* ── Comparison table slide ── */
   .cmp-table {
@@ -890,6 +917,7 @@
         <div class="tag-row" style="margin-top:12px;">
           <span class="tag t-green">서강대</span><span class="tag t-green">단국대</span><span class="tag t-green">가천대</span><span class="tag t-green">건국대</span><span class="tag t-green">연세대</span>
         </div>
+        <a class="detail-link" href="project_4.html" target="_blank" rel="noopener">상세 발표 보기 <span>↗</span></a>
       </div>
       <div class="proj-right">
         <div class="info-row delay-1">
@@ -987,6 +1015,7 @@
         <div class="tag-row" style="margin-top:12px;">
           <span class="tag">가천대</span><span class="tag">건국대</span><span class="tag">단국대</span><span class="tag">서강대</span>
         </div>
+        <a class="detail-link" href="project_5.html" target="_blank" rel="noopener">상세 발표 보기 <span>↗</span></a>
       </div>
       <div class="proj-right">
         <div class="info-row delay-1">
@@ -1171,6 +1200,7 @@
           <span class="tag">OCR</span>
           <span class="tag t-amber">보안 규칙</span>
         </div>
+        <a class="detail-link" href="project_9.html" target="_blank" rel="noopener">상세 발표 보기 <span>↗</span></a>
       </div>
       <div class="proj-right">
         <div class="info-row delay-1">
@@ -1296,6 +1326,7 @@
           <span class="tag t-amber">Cloud Functions</span>
           <span class="tag">TTS</span>
         </div>
+        <a class="detail-link" href="project_10.html" target="_blank" rel="noopener">상세 발표 보기 <span>↗</span></a>
       </div>
       <div class="proj-right">
         <div class="info-row delay-1">
